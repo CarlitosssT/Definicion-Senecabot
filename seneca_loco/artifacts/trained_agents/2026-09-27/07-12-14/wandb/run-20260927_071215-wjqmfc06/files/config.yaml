@@ -1,0 +1,181 @@
+_wandb:
+    value:
+        cli_version: 0.30.0
+        e:
+            g20lxda45bbjiiwu1ch86v95uqn35mto:
+                args:
+                    - experiment.total_timesteps=100e6
+                codePath: simulation/training/train.py
+                codePathLocal: simulation/training/train.py
+                cpu_count: 14
+                cpu_count_logical: 20
+                cudaVersion: "13.2"
+                disk:
+                    /:
+                        total: "81975697408"
+                        used: "39637094400"
+                email: ca.tovar2@uniandes.edu.co
+                executable: /home/carlitos/Optimizacion Geometria/.venv/bin/python
+                git:
+                    commit: f9ef364361d6950cee940476eeee9eca9788f153
+                    remote: https://github.com/Robiolab/seneca_loco.git
+                gpu: NVIDIA GeForce RTX 4070 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 4608
+                      memoryTotal: "8585740288"
+                      name: NVIDIA GeForce RTX 4070 Laptop GPU
+                      uuid: GPU-8f4e76fa-0c2b-5e16-cd1d-5e709d3e11c7
+                host: carlitos-Blade-15-RZ09-0485
+                memory:
+                    total: "16380092416"
+                os: Linux-7.0.0-34-generic-x86_64-with-glibc2.39
+                program: /home/carlitos/Optimizacion Geometria/seneca_loco/simulation/training/train.py
+                python: CPython 3.12.3
+                root: /home/carlitos/Optimizacion Geometria/seneca_loco/artifacts/trained_agents/2026-09-27/07-12-14
+                startedAt: "2026-09-27T12:12:15.648718Z"
+                writerId: g20lxda45bbjiiwu1ch86v95uqn35mto
+        m: []
+        python_version: 3.12.3
+        t:
+            "1":
+                - 12
+                - 45
+                - 49
+                - 50
+            "2":
+                - 12
+                - 45
+                - 49
+                - 50
+            "3":
+                - 2
+                - 16
+                - 61
+                - 62
+            "4": 3.12.3
+            "5": 0.30.0
+            "12": 0.30.0
+            "13": linux-x86_64
+agent_save_path:
+    value: /home/carlitos/Optimizacion Geometria/seneca_loco/artifacts/trained_agents/2026-09-27/07-12-14/PPOJax_saved.pkl
+control_config:
+    value:
+        torque_control:
+            control_params: null
+            control_type: DefaultControl
+experiment:
+    value:
+        activation: tanh
+        anneal_lr: true
+        clip_eps: 0.2
+        debug: false
+        ent_coef: 0.01
+        env_params:
+            control_params: null
+            control_type: DefaultControl
+            env_name: SenecaBot
+            goal_params:
+                visualize_goal: true
+            goal_type: GoalTrajMimic
+            headless: true
+            horizon: 1000
+            nconmax: 26000
+            njmax: 150
+            record_camera: follow
+            reward_params:
+                action_jerk_w: 0.5
+                action_rate_coeff: 0.0025146232695822477
+                action_rate_w: 0.5
+                contact_height: 0.037
+                contact_ref_frac: 0.3
+                contact_sites:
+                    - fr_foot_mimic
+                    - fl_foot_mimic
+                    - br_foot_mimic
+                    - bl_foot_mimic
+                contact_w_sum: 0.5
+                joint_acc_coeff: 0.0005
+                joint_torque_coeff: 0.009895445299195107
+                qpos_w_exp: 5.9682311184743835
+                qpos_w_sum: 0.4792990831842575
+                qvel_w_exp: 1
+                qvel_w_sum: 0.34248070562463884
+                rootvel_w_exp: 100
+                rootvel_w_sum: 0.5
+                rpos_w_sum: 0.6360403640349603
+                rquat_w_sum: 0.2720356175290966
+                rvel_w_sum: 0.15
+                sites_for_mimic:
+                    - fr_foot_mimic
+                    - fl_foot_mimic
+                    - br_foot_mimic
+                    - bl_foot_mimic
+                    - base_mimic
+                    - fr_shank_mimic
+                    - fl_shank_mimic
+                    - br_shank_mimic
+                    - bl_shank_mimic
+                    - fl_thigh_mimic
+                    - fr_thigh_mimic
+                    - bl_thigh_mimic
+                    - br_thigh_mimic
+                track_root_xy: false
+            reward_type: MimicReward
+            use_mjwarp: true
+        gae_lambda: 0.95
+        gamma: 0.995
+        hidden_layers:
+            - 512
+            - 256
+        init_std: 0.3
+        learnable_std: true
+        lr: 0.0001
+        max_grad_norm: 0.5
+        n_seeds: 1
+        normalize_env: true
+        num_envs: 2048
+        num_minibatches: 32
+        num_steps: 200
+        proportion_env_reward: 0
+        task_factory:
+            name: ImitationFactory
+        total_timesteps: 1e+08
+        update_epochs: 4
+        validation:
+            active: true
+            joints_to_ignore: []
+            measures:
+                - EuclideanDistance
+                - DynamicTimeWarping
+                - DiscreteFrechetDistance
+            num: 24
+            num_envs: 100
+            num_steps: 100
+            quantities:
+                - JointPosition
+                - JointVelocity
+                - RelSitePosition
+                - RelSiteOrientation
+                - RelSiteVelocity
+            rel_site_names:
+                - fr_foot_mimic
+                - fl_foot_mimic
+                - br_foot_mimic
+                - bl_foot_mimic
+                - base_mimic
+                - fr_shank_mimic
+                - fl_shank_mimic
+                - br_shank_mimic
+                - bl_shank_mimic
+                - fl_thigh_mimic
+                - fr_thigh_mimic
+                - bl_thigh_mimic
+                - br_thigh_mimic
+        vf_coef: 0.5
+        vmap_across_seeds: true
+        weight_decay: 0
+wandb:
+    value:
+        project: deepmimic_senecabot

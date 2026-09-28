@@ -1,0 +1,31 @@
+﻿motor_name;rated_voltage_V;rated_voltage_A;nominal_torque_Nm;peak_torque_Nm;nominal_speed_rpm;max_speed_rpm;max_current_A;speed_constant_rpm_per_V;torque_constant_Nm_per_A;motor_mass_kg;no_load_speed_rpm;stall_torque_Nm;efficiency
+MyActuator L-4005;24;1,44;0,07;0,25;1600;2390;5,8;199;0,05;0,065;2390;0,25;Datos/efficiency_map/efficiency_map_MyActuator_L4005.csv
+MyActuator L-4010;24;1,43;0,15;0,33;560;1120;3,2;93;0,1;0,092;1120;0,33;Datos/efficiency_map/efficiency_map_MyActuator_L4010.csv
+MyActuator L-4015;24;1,88;0,22;0,49;520;1010;4,3;63;0,12;0,12;1010;0,49;Datos/efficiency_map/efficiency_map_MyActuator_L4015.csv
+MyActuator L-5005;24;1,67;0,13;0,42;1360;1970;5;123;0,08;0,092;1970;0,42;
+MyActuator L-5010;24;1,65;0,26;0,65;600;1015;4,8;63;0,16;0,135;1015;0,65;Datos/efficiency_map/efficiency_map_MyActuator_L5010.csv
+MyActuator L-5015;24;1,57;0,36;0,82;350;680;3,62;43;0,23;0,174;680;0,82;
+MyActuator L-7015;24;3,62;1;3,8;580;805;15;34;0,28;0,36;805;3,8;Datos/efficiency_map/efficiency_map_MyActuator_L7015.csv
+MyActuator L-7025;24;3;1,6;4,1;280;510;8,5;21;0,53;0,54;510;4,1;Datos/efficiency_map/efficiency_map_MyActuator_L7025.csv
+MyActuator L-9015;24;3,34;1,67;5;290;500;11;21;0,45;0,65;500;5;Datos/efficiency_map/efficiency_map_MyActuator_L9015.csv
+MyActuator L-9025;24;3,46;2,79;5,8;130;280;7,6;12;0,76;0,88;280;5,8;Datos/efficiency_map/efficiency_map_MyActuator_L9025.csv
+MyActuator H-40-15;24;5,1;0,15;0,3;3000;3700;12,8;125;0,03;0,2;3700;0,43;Datos/efficiency_map/efficiency_map_MyActuator_H4015.csv
+MyActuator H-50-15;24;4,9;0,35;0,9;2500;3200;12,4;126,10;0,07;0,24;3200;2,30;Datos/efficiency_map/efficiency_map_MyActuator_H5015.csv
+MyActuator H-70-15;48;13,2;0,8;2;2400;2800;13,2;58,82;0,18;0,47;2800;2,54;Datos/efficiency_map/efficiency_map_MyActuator_H7015.csv
+MyActuator H-90-15;48;6,6;1,5;3,75;1600;2000;19,8;47,39;0,23;0,71;2000;1,92;Datos/efficiency_map/efficiency_map_MyActuator_H9015.csv
+MyActuator X4-3 6:1;24;2;1,5;3;200;250;4;N/A;N/A;0,3;250;3;Datos/efficiency_map/efficiency_map_MyActuator_X43.csv
+MyActuator X6-7 6:1;48;4;3,5;7;400;670;9;N/A;N/A;0,35;670;7;Datos/efficiency_map/efficiency_map_MyActuator_X67.csv
+MyActuator X6-40 36:1;48;5,2;18;40;90;109,9;10,5;N/A;N/A;0,59;109,9;40;Datos/efficiency_map/efficiency_map_MyActuator_X640.csv
+MyActuator X8-25 9:1;48;3,2;10;25;110;254,3;8;N/A;N/A;0,71;254,3;25;Datos/efficiency_map/efficiency_map_MyActuator_X825.csv
+MyActuator X6-8 8:1;48;3,6;4,5;8;310;368;7,2;N/A;N/A;0,49;368;8;Datos/efficiency_map/efficiency_map_MyActuator_X68.csv
+MyActuator X8-20 6:1;48;5,2;10;20;190;220;10,5;N/A;N/A;0,78;220;20;Datos/efficiency_map/efficiency_map_MyActuator_X820.csv
+MyActuator X8-60 36:1;48;4;30;60;40;46,3;8;N/A;N/A;0,9;46,3;60;Datos/efficiency_map/efficiency_map_MyActuator_X860.csv
+MyActuator X10-40 7:1;48;6,5;15;40;165;186,4;15;N/A;N/A;1,15;186,4;40;Datos/efficiency_map/efficiency_map_MyActuator_X1040.csv
+MyActuator X10-100 35:1;48;6,7;50;100;50;53,6;13,5;N/A;N/A;1,7;53,6;100;Datos/efficiency_map/efficiency_map_MyActuator_X10100.csv
+MyActuator X2-7 28.17:1;24;3;2,5;7;142;N/A;8,1;4,3;0,8;0,26;178;7,5;
+MyActuator X4-10 12.6:1;24;7,8;4;10;238;N/A;19,5;6;0,8;0,33;317;7,2;
+MyActuator X4-36 36:1;24;6,1;10,5;34;83;N/A;21,5;6;1,9;0,36;111;28,75;
+MyActuator X6-60 19,612:1;48;9,5;20;60;153;N/A;29,1;16;2,1;0,82;176;60;
+MyActuator X8-32 9:1;24;6,2;8;32;244;N/A;30;10,9;1,3;0,55;277;24;
+MyActuator X8-102 19,612:1;48;17,6;43;120;127;N/A;43,8;19,2;2,4;1,4;158;129;
+MyActuator X12-320 20:1;48;30;85;320;100;N/A;100;17,9;3,3;2,37;125;275;

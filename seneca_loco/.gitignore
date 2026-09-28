@@ -1,0 +1,58 @@
+# ========================
+# Algunas carptas que no quiero
+# ========================
+# 2026-09-27: this folder is now part of the "Optimizacion Geometria" repository, which versions the
+# generated output too (trained agents, figures, recordings, wandb logs), so these rules are disabled.
+# Re-enable them to go back to the original behavior (outputs not versioned).
+
+# ALL generated output lives here (figures, agents, wandb, optuna, recordings)
+# artifacts/
+
+# belt-and-braces: pre-restructure output dirs
+# outputs/
+# wandb/
+# LocoMuJoCo_recordings/
+# LocoMuJoCo_recordings
+# trained_agents/
+# outputs_project/
+
+# ========================
+# Archivos de Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+MUJOCO_LOG.txt
+
+# ========================
+# Entornos Virtuales
+# ========================
+venv/
+env/
+.venv/
+
+# ========================
+# Editores e IDEs
+# ========================
+.vscode/
+.idea/
+*.swp
+
+# ========================
+# Sistema Operativo
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Secretos y Entorno
+# ========================
+.env
+
+# ========================
+# Archivos del Proyecto / Generados
+# ========================
+# *.log   (disabled: the training run logs next to each agent are versioned)
+**/*.egg-info/
+# (Opcional) Si generas muchos XMLs en una carpeta de resultados:
+# simulation/xml/resultados/

@@ -1,0 +1,1 @@
+El script training.py correra el algoritmo de entrenamiento y sus resultados se encontraran en la carpeta llamada outputs.

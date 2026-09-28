@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "senecabot_simulation"
+version = "0.1.0"
+description = "MuJoCo simulation package for Senecabot"
+authors = [{ name = "Nicolas Andrade Manrique" }]
+requires-python = ">=3.11"
+dependencies = [
+  "mujoco", "mujoco-mjx", "hydra-core", "jax", "numpy", "omegaconf",
+  "opencv-python", "pandas", "scipy", "matplotlib", "ezc3d", "mediapy",
+  "wandb", "ipykernel", "optuna", "nbformat",
+]
+
+[tool.setuptools.packages.find]
+include = ["simulation*"]

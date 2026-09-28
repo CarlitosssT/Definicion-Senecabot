@@ -1,0 +1,183 @@
+<mujoco model="senecabot">
+    <compiler angle="degree" autolimits="true"/>
+    
+    <!-- OPCIONES FÍSICAS -->
+    <option cone="elliptic" impratio="100" timestep="0.002"/>
+
+    <visual>
+        <global offwidth="3840" offheight="2160"/>
+    </visual>
+
+    <include file="scene.xml"/>
+    <include file="mimic_sites.xml"/>
+
+    <!-- DEFAULTS JERÁRQUICOS -->
+    <default>
+        <default class="senecabot">
+            <geom friction="0.6" margin="0.001" condim="1" group="0"/>
+            <joint damping="1.5" armature="0.01" frictionloss="0.2"/>
+            
+            <motor ctrllimited="true"/>
+
+            <default class="hip">
+                <joint type="hinge" axis="0 1 0"/>
+                </default>
+            <default class="knee">
+                <joint type="hinge" axis="0 -1 0"/>
+                </default>
+            <default class="ankle">
+                <joint type="hinge" axis="0 1 0" damping="0.05"/> </default>
+            <default class="foot">
+                <geom priority="1" solimp="0.015 1 0.022" condim="6" friction="0.8 0.02 0.01"/>
+            </default>
+        </default>
+    </default>
+
+    <!-- LEG SEGMENT NAMING.
+         This is a SIMPLIFIED quadruped: all four legs are identical 3-DOF serial
+         chains, so the segment bodies use generic proximal->distal names
+         (upper / lower / foot) rather than per-limb anatomy. A real ovine forelimb
+         (humerus / forearm / metacarpus, joints shoulder-elbow-carpus) and hindlimb
+         (femur / tibia / metatarsus, joints hip-stifle-hock) are NOT the same; one
+         uniform anatomical scheme cannot be correct for both, so we stay generic.
+         The hip/knee/ankle joint names are likewise functional, not anatomical.
+         NOTE: the mimic SITE names (*_thigh_mimic, *_shank_mimic, *_foot_mimic) keep
+         their legacy words on purpose — they are referenced by name in
+         simulation/config/pipeline.py (SITE_NAMES) and the fork env senecabot.py, so
+         renaming them would break the trained pipeline. Body<->site word mismatch
+         (e.g. body "fr_upper" holds site "fr_thigh_mimic") is expected. -->
+    <worldbody>
+        <body name="base" pos="0 0 0.4" childclass="senecabot">
+            
+            <camera name="follow" mode="track" target="base" pos="1 -1 0" xyaxes="0.707 0.707 0 0 0 1"/> <!-- EAST-->
+            <camera name="follow_west" mode="track" target="base" pos="1 1 0" xyaxes="-0.707 0.707 0 0 0 1"/>
+            <freejoint name="root"/>
+            <geom type="box" size="0.21 0.12 0.06" mass="3" rgba="0.8 0.6 0.4 1"/>
+            
+            <site name="base_mimic" class="mimic" pos="0 0 0" size="0.01"/>
+
+            <!-- ================= Pata Delantera Derecha (FR) ================= -->
+            <body name="fr_upper" pos="0.2 -0.1 -0.04">
+                <joint name="fr_hip_joint" class="hip" range="25 105"/>
+                <geom type="capsule" fromto="0 0 0 0 0 -0.121" size="0.03" rgba="0.2 0.2 0.2 1"/>
+                <site name="fr_thigh_mimic" class="mimic" pos="0 0 -0.121"/>
+
+                <body name="fr_lower" pos="0 0 -0.121">
+                    <joint name="fr_knee_joint" class="knee" range="34 150"/>
+                    <geom type="capsule" fromto="0 0 0 0 0 -0.111" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                    <site name="fr_shank_mimic" class="mimic" pos="0 0 -0.111"/>
+
+                    <body name="fr_foot" pos="0 0 -0.111">
+                        <joint name="fr_ankle_joint" class="ankle" range="0 160"/>
+                        <geom type="capsule" fromto="0 0 0 0 0 -0.1534" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                        <geom name="fr_foot" type="sphere" size="0.025" pos="0 0 -0.1534" rgba="0.9 0.1 0.1 1" class="foot"/>
+                        
+                        <site name="fr_foot" pos="0 0 -0.1534" size="0.01"/>
+                        <site name="fr_foot_mimic" class="mimic" pos="0 0 -0.1534" size="0.01"/>
+                    </body>
+                </body>
+            </body>
+
+            <!-- ================= Pata Delantera Izquierda (FL) ================= -->
+            <body name="fl_upper" pos="0.2 0.1 -0.04">
+                <joint name="fl_hip_joint" class="hip" range="25 105"/>
+                <geom type="capsule" fromto="0 0 0 0 0 -0.121" size="0.03" rgba="0.2 0.2 0.2 1"/>
+                <site name="fl_thigh_mimic" class="mimic" pos="0 0 -0.121"/>
+
+                <body name="fl_lower" pos="0 0 -0.121">
+                    <joint name="fl_knee_joint" class="knee" range="34 150"/>
+                    <geom type="capsule" fromto="0 0 0 0 0 -0.111" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                    <site name="fl_shank_mimic" class="mimic" pos="0 0 -0.111"/>
+
+                    <body name="fl_foot" pos="0 0 -0.111">
+                        <joint name="fl_ankle_joint" class="ankle" range="0 160"/>
+                        <geom type="capsule" fromto="0 0 0 0 0 -0.1534" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                        <geom name="fl_foot" type="sphere" size="0.025" pos="0 0 -0.1534" rgba="0.9 0.1 0.1 1" class="foot"/>
+                        
+                        <site name="fl_foot" pos="0 0 -0.1534" size="0.01"/>
+                        <site name="fl_foot_mimic" class="mimic" pos="0 0 -0.1534" size="0.01"/>
+                    </body>
+                </body>
+            </body>
+
+            <!-- ================= Pata Trasera Derecha (BR) ================= -->
+            <body name="br_upper" pos="-0.2 -0.1 0.04">
+                <joint name="br_hip_joint" class="hip" range="-105 -40"/>
+                <geom type="capsule" fromto="0 0 0 0 0 -0.166" size="0.03" rgba="0.2 0.2 0.2 1"/>
+                <site name="br_thigh_mimic" class="mimic" pos="0 0 -0.166"/>
+
+                <body name="br_lower" pos="0 0 -0.166">
+                    <joint name="br_knee_joint" class="knee" range="-140 -40"/>
+                    <geom type="capsule" fromto="0 0 0 0 0 -0.231" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                    <site name="br_shank_mimic" class="mimic" pos="0 0 -0.231"/>
+
+                    <body name="br_foot" pos="0 0 -0.231">
+                        <joint name="br_ankle_joint" class="ankle" range="-85 0"/>
+                        <geom type="capsule" fromto="0 0 0 0 0 -0.148" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                        <geom name="br_foot" type="sphere" size="0.025" pos="0 0 -0.148" rgba="0.9 0.1 0.1 1" class="foot"/>
+                        
+                        <site name="br_foot" pos="0 0 -0.148" size="0.01"/>
+                        <site name="br_foot_mimic" class="mimic" pos="0 0 -0.148" size="0.01"/>
+                    </body>
+                </body>
+            </body>
+
+            <!-- ================= Pata Trasera Izquierda (BL) ================= -->
+            <body name="bl_upper" pos="-0.2 0.1 0.04">
+                <joint name="bl_hip_joint" class="hip" range="-105 -40"/>
+                <geom type="capsule" fromto="0 0 0 0 0 -0.166" size="0.03" rgba="0.2 0.2 0.2 1"/>
+                <site name="bl_thigh_mimic" class="mimic" pos="0 0 -0.166"/>
+
+                <body name="bl_lower" pos="0 0 -0.166">
+                    <joint name="bl_knee_joint" class="knee" range="-140 -40"/>
+                    <geom type="capsule" fromto="0 0 0 0 0 -0.231" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                    <site name="bl_shank_mimic" class="mimic" pos="0 0 -0.231"/>
+
+                    <body name="bl_foot" pos="0 0 -0.231">
+                        <joint name="bl_ankle_joint" class="ankle" range="-85 0"/>
+                        <geom type="capsule" fromto="0 0 0 0 0 -0.148" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                        <geom name="bl_foot" type="sphere" size="0.025" pos="0 0 -0.148" rgba="0.9 0.1 0.1 1" class="foot"/>
+                        
+                        <site name="bl_foot" pos="0 0 -0.148" size="0.01"/>
+                        <site name="bl_foot_mimic" class="mimic" pos="0 0 -0.148" size="0.01"/>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <!-- EXCLUSIONES DE CONTACTO (Sin cambios, usa los nombres de los bodies) -->
+    <contact>
+        <exclude body1="base" body2="fr_upper"/>
+        <exclude body1="base" body2="fr_lower"/>
+        <exclude body1="base" body2="fr_foot"/>
+        <exclude body1="base" body2="fl_upper"/>
+        <exclude body1="base" body2="fl_lower"/>
+        <exclude body1="base" body2="fl_foot"/>
+        <exclude body1="base" body2="br_upper"/>
+        <exclude body1="base" body2="br_lower"/>
+        <exclude body1="base" body2="br_foot"/>
+        <exclude body1="base" body2="bl_upper"/>
+        <exclude body1="base" body2="bl_lower"/>
+        <exclude body1="base" body2="bl_foot"/>
+    </contact>
+
+    <!-- ACTUADORES: Nombres limpios para el código de Python -->
+    <actuator>
+        <motor name="fr_hip"   joint="fr_hip_joint"   class="hip"   ctrlrange="-80 80"/>
+        <motor name="fr_knee"  joint="fr_knee_joint"  class="knee"  ctrlrange="-80 80"/>
+        <motor name="fr_ankle" joint="fr_ankle_joint" class="ankle" ctrlrange="-40 40"/>
+        
+        <motor name="fl_hip"   joint="fl_hip_joint"   class="hip"   ctrlrange="-80 80"/>
+        <motor name="fl_knee"  joint="fl_knee_joint"  class="knee"  ctrlrange="-80 80"/>
+        <motor name="fl_ankle" joint="fl_ankle_joint" class="ankle" ctrlrange="-40 40"/>
+        
+        <motor name="br_hip"   joint="br_hip_joint"   class="hip"   ctrlrange="-80 80"/>
+        <motor name="br_knee"  joint="br_knee_joint"  class="knee"  ctrlrange="-80 80"/>
+        <motor name="br_ankle" joint="br_ankle_joint" class="ankle" ctrlrange="-40 40"/>
+        
+        <motor name="bl_hip"   joint="bl_hip_joint"   class="hip"   ctrlrange="-80 80"/>
+        <motor name="bl_knee"  joint="bl_knee_joint"  class="knee"  ctrlrange="-80 80"/>
+        <motor name="bl_ankle" joint="bl_ankle_joint" class="ankle" ctrlrange="-40 40"/>
+    </actuator>
+</mujoco>

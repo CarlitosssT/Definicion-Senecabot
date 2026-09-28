@@ -1,0 +1,43 @@
+{
+  "os": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "python": "CPython 3.12.3",
+  "startedAt": "2026-09-27T12:12:15.648718Z",
+  "args": [
+    "experiment.total_timesteps=100e6"
+  ],
+  "program": "/home/carlitos/Optimizacion Geometria/seneca_loco/simulation/training/train.py",
+  "codePath": "simulation/training/train.py",
+  "codePathLocal": "simulation/training/train.py",
+  "git": {
+    "remote": "https://github.com/Robiolab/seneca_loco.git",
+    "commit": "f9ef364361d6950cee940476eeee9eca9788f153"
+  },
+  "email": "ca.tovar2@uniandes.edu.co",
+  "root": "/home/carlitos/Optimizacion Geometria/seneca_loco/artifacts/trained_agents/2026-09-27/07-12-14",
+  "host": "carlitos-Blade-15-RZ09-0485",
+  "executable": "/home/carlitos/Optimizacion Geometria/.venv/bin/python",
+  "cpu_count": 14,
+  "cpu_count_logical": 20,
+  "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "81975697408",
+      "used": "39637094400"
+    }
+  },
+  "memory": {
+    "total": "16380092416"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+      "memoryTotal": "8585740288",
+      "cudaCores": 4608,
+      "architecture": "Ada",
+      "uuid": "GPU-8f4e76fa-0c2b-5e16-cd1d-5e709d3e11c7"
+    }
+  ],
+  "cudaVersion": "13.2",
+  "writerId": "g20lxda45bbjiiwu1ch86v95uqn35mto"
+}

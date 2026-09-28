@@ -1,0 +1,94 @@
+<mujoco model="senecabot">
+    <compiler angle="degree" coordinate="local"/>
+    <visual>
+    <global offwidth="1920" offheight="1080"/>
+  </visual>
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" rgb1=".1 .2 .3"
+     rgb2=".2 .3 .4" width="300" height="300"/>
+    <material name="grid" texture="grid" texrepeat="8 8" reflectance=".2"/>
+  </asset>
+  <worldbody>
+    <geom size="2 2 .01" type="plane" material="grid"/>
+    <light pos="0 0 3"/>
+    <body name="base" pos="0 0 0.42">
+        <camera name="follow" mode="track" target="base" pos="1 -1 0" xyaxes="0.707 0.707 0 0 0 1"/>
+        <camera name="lateral_view" pos="0 -1 -0.1" xyaxes="1 0 0 0 0 1"/>
+        <camera name="front_view" pos="1 0 -0.1" xyaxes="0 1 0 0 0 1"/>
+        <camera name="diagonal_view" pos="1 -1 -0.1" xyaxes="0.707 0.707 0 0 0 1"/>
+
+        <freejoint name="root"/>
+        <geom type="box" size="{torso_l} {torso_w} {torso_h}" rgba="0.8 0.6 0.4 1"/>
+        <body name="fr_thigh" pos="{f_distance} -{w_distance} -{h_difference_f}">
+            <joint name="fr_hip" type="hinge" axis="0 1 0" range="60 105"/>
+            <geom name="fr_thigh_geom" type="capsule" fromto="0 0 0 0 0 -{f_hip_len}" size="0.03" rgba="0.2 0.2 0.2 1"/>
+            <body name="fr_shank" pos="0 0 -{f_hip_len}">
+                <joint name="fr_knee" type="hinge" axis="0 -1 0" range="34 120"/>
+                <geom name="fr_shank_geom" type="capsule" fromto="0 0 0 0 0 -{f_knee_len}" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                <body name="fr_metatarsus" pos="0 0 -{f_knee_len}">
+                    <joint name="fr_ankle" type="hinge" axis="0 1 0" range="25 160"/>
+                    <geom name="fr_metatarsus_geom" type="capsule" fromto="0 0 0 0 0 -{f_ankle_len}" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                    <geom name="fr_foot" type="sphere" size="0.025" pos="0 0 -{f_ankle_len}" rgba="0.9 0.1 0.1 1"/>
+                </body>
+            </body>
+        </body>
+
+        <body name="fl_thigh" pos="{f_distance} {w_distance} -{h_difference_f}">
+            <joint name="fl_hip" type="hinge" axis="0 1 0" range="60 100"/>
+            <geom name="fl_thigh_geom" type="capsule" fromto="0 0 0 0 0 -{f_hip_len}" size="0.03" rgba="0.2 0.2 0.2 1"/>
+            <body name="fl_shank" pos="0 0 -{f_hip_len}">
+                <joint name="fl_knee" type="hinge" axis="0 -1 0" range="34 120"/>
+                <geom name="fl_shank_geom" type="capsule" fromto="0 0 0 0 0 -{f_knee_len}" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                <body name="fl_metatarsus" pos="0 0 -{f_knee_len}">
+                    <joint name="fl_ankle" type="hinge" axis="0 1 0" range="25 160"/>
+                    <geom name="fl_metatarsus_geom" type="capsule" fromto="0 0 0 0 0 -{f_ankle_len}" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                    <geom name="fl_foot" type="sphere" size="0.025" pos="0 0 -{f_ankle_len}" rgba="0.9 0.1 0.1 1"/>
+                </body>
+            </body>
+        </body>
+
+        <body name="br_thigh" pos="-{b_distance} -{w_distance} {h_difference_b}">
+            <joint name="br_hip" type="hinge" axis="0 1 0" range="60 105"/>
+            <geom name="br_thigh_geom" type="capsule" fromto="0 0 0 0 0 -{r_hip_len}" size="0.03" rgba="0.2 0.2 0.2 1"/>
+            <body name="br_shank" pos="0 0 -{r_hip_len}">
+                <joint name="br_knee" type="hinge" axis="0 -1 0" range="88 120"/>
+                <geom name="br_shank_geom" type="capsule" fromto="0 0 0 0 0 -{r_knee_len}" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                <body name="br_metatarsus" pos="0 0 -{r_knee_len}">
+                    <joint name="br_ankle" type="hinge" axis="0 1 0" range="40 85"/>
+                    <geom name="br_metatarsus_geom" type="capsule" fromto="0 0 0 0 0 -{r_ankle_len}" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                    <geom name="br_foot" type="sphere" size="0.025" pos="0 0 -{r_ankle_len}" rgba="0.9 0.1 0.1 1"/>
+                </body>
+            </body>
+        </body>
+
+        <body name="bl_thigh" pos="-{b_distance} {w_distance} {h_difference_b}">
+            <joint name="bl_hip" type="hinge" axis="0 1 0" range="60 105"/>
+            <geom name="bl_thigh_geom" type="capsule" fromto="0 0 0 0 0 -{r_hip_len}" size="0.03" rgba="0.2 0.2 0.2 1"/>
+            <body name="bl_shank" pos="0 0 -{r_hip_len}">
+                <joint name="bl_knee" type="hinge" axis="0 -1 0" range="88 120"/>
+                <geom name="bl_shank_geom" type="capsule" fromto="0 0 0 0 0 -{r_knee_len}" size="0.025" rgba="0.3 0.3 0.3 1"/>
+                <body name="bl_metatarsus" pos="0 0 -{r_knee_len}">
+                    <joint name="bl_ankle" type="hinge" axis="0 1 0" range="40 85"/>
+                    <geom name="bl_metatarsus_geom" type="capsule" fromto="0 0 0 0 0 -{r_ankle_len}" size="0.02" rgba="0.4 0.4 0.4 1"/>
+                    <geom name="bl_foot" type="sphere" size="0.025" pos="0 0 -{r_ankle_len}" rgba="0.9 0.1 0.1 1"/>
+                </body>
+            </body>
+        </body>
+
+    </body>
+  </worldbody>
+  <actuator>
+    <motor name="fr_hip"   joint="fr_hip"   gear="1"/>
+    <motor name="fr_knee"  joint="fr_knee"  gear="1"/>
+    <motor name="fr_ankle" joint="fr_ankle" gear="1"/>
+    <motor name="fl_hip"   joint="fl_hip"   gear="1"/>
+    <motor name="fl_knee"  joint="fl_knee"  gear="1"/>
+    <motor name="fl_ankle" joint="fl_ankle" gear="1"/>
+    <motor name="br_hip"   joint="br_hip"   gear="1"/>
+    <motor name="br_knee"  joint="br_knee"  gear="1"/>
+    <motor name="br_ankle" joint="br_ankle" gear="1"/>
+    <motor name="bl_hip"   joint="bl_hip"   gear="1"/>
+    <motor name="bl_knee"  joint="bl_knee"  gear="1"/>
+    <motor name="bl_ankle" joint="bl_ankle" gear="1"/>
+</actuator>
+</mujoco>

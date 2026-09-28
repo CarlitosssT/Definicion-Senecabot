@@ -1,0 +1,78 @@
+defaults:
+  - override hydra/job_logging: default
+  - override hydra/launcher: basic
+
+wandb:
+  project: "amp"
+
+experiment:
+  task_factory:
+    name: ImitationFactory
+    params:
+      default_dataset_conf:
+          task: run
+  env_params:
+    env_name: MjxUnitreeH1
+    disable_arms: false
+    headless: True
+    horizon: 1000
+    goal_type: GoalTrajRootVelocity
+    goal_params:
+      visualize_goal: true
+    reward_type: TargetVelocityTrajReward
+  hidden_layers: [512, 256]
+  lr: 6e-5
+  disc_lr: 5e-5
+  num_envs: 2048
+  num_steps: 14
+  total_timesteps: 75e6
+  update_epochs: 4
+  disc_minibatch_size: 2048
+  proportion_env_reward: 0.5
+  n_disc_epochs: 50
+  num_minibatches: 32
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_eps: 0.1
+  init_std: 0.2
+  learnable_std: false
+  ent_coef: 0.0
+  disc_ent_coef: 0.0
+  vf_coef: 0.5
+  max_grad_norm: 0.75
+  activation: tanh
+  anneal_lr: false
+  weight_decay: 0.0001
+  normalize_env: true
+  debug: false
+  n_seeds: 1  # while automatically take seeds from 1 to n_seeds
+  vmap_across_seeds: true
+  validation:
+    active: false
+    num_steps: 100
+    num_envs: 100
+    num: 10 # set to 0 to disable validation
+    # if none of the following is set, only the mean reward and episode length is logged
+    quantities: # quantities to be used for the distance measures below
+      - JointPosition
+      - JointVelocity
+      - RelSitePosition
+      - RelSiteVelocity
+      - RelSiteOrientation
+    measures:
+      - EuclideanDistance
+      - DynamicTimeWarping
+      - DiscreteFrechetDistance
+    rel_site_names:
+      - upper_body_mimic
+      - left_hand_mimic
+      - left_foot_mimic
+      - right_hand_mimic
+      - right_foot_mimic
+    joints_to_ignore:
+      - pelvis_tx
+      - pelvis_tz
+      - pelvis_ty
+      - pelvis_tilt
+      - pelvis_list
+      - pelvis_rotation
