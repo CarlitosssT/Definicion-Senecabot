@@ -50,6 +50,115 @@ export SENECA_HOME="$PWD/seneca_loco"      # raíz de seneca_loco (Hydra guarda 
 Si tienes ROS instalado, ejecuta `unset PYTHONPATH` después de activar el entorno para que sus paquetes no se
 mezclen con los del `.venv`.
 
+### Instalación en Windows (WSL2)
+
+En Windows nativo el entrenamiento no corre: JAX con CUDA y MJWarp solo existen para Linux, y varios paquetes
+`nvidia-*-cu12` de `requirements.txt` no tienen versión para Windows. La solución es WSL2 (Ubuntu dentro de
+Windows), con la que el repo corre sin cambios y con GPU. Requiere Windows 10 22H2 / Windows 11 y GPU NVIDIA.
+
+**1. Instalar Ubuntu 24.04** — en PowerShell (Windows) como administrador:
+
+```powershell
+wsl --install -d Ubuntu-24.04
+wsl --set-default Ubuntu-24.04
+```
+
+Usa **24.04** explícitamente: `wsl --install` sin argumentos instala la última versión de Ubuntu, cuyo Python
+no coincide con el 3.12 que fija `requirements.txt`. Al terminar se crea un usuario y contraseña de Linux. Para
+entrar después: `wsl -d Ubuntu-24.04` o "Ubuntu 24.04" en el menú de Windows Terminal.
+
+> Los comandos `wsl ...` se escriben en PowerShell (`PS C:\...>`), no dentro de Ubuntu (`usuario@PC:~$`): dentro
+> de Ubuntu `wsl` es otro programa sin relación.
+
+**2. Paquetes base y comprobación de la GPU** — dentro de Ubuntu. Trabaja siempre en tu carpeta de Linux (`~`),
+no en `/mnt/c/...` (el disco de Windows es mucho más lento desde WSL):
+
+```bash
+cd ~
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git curl build-essential python3-venv python3-dev gh
+lsb_release -a        # debe decir 24.04
+python3 --version     # debe decir 3.12.x
+nvidia-smi            # debe mostrar la GPU
+```
+
+El driver NVIDIA se instala **solo en Windows** (no dentro de Ubuntu). Si `nvidia-smi` falla, actualiza el
+driver en Windows y ejecuta `wsl --shutdown` en PowerShell.
+
+**3. Clonar el repositorio:**
+
+```bash
+gh auth login         # GitHub.com -> HTTPS -> Login with a web browser
+gh repo clone CarlitosssT/Definicion-Senecabot
+cd ~/Definicion-Senecabot
+```
+
+**4. Entorno Python** (igual que en Linux):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt            # varios GB (paquetes CUDA), tarda unos minutos
+pip install -e loco-mujoco-seneca -e seneca_loco
+echo 'export SENECA_HOME="$HOME/Definicion-Senecabot/seneca_loco"' >> ~/.bashrc
+echo 'export MUJOCO_GL=egl' >> ~/.bashrc   # render sin pantalla (videos de entrenamiento)
+source ~/.bashrc
+```
+
+**5. Verificar:**
+
+```bash
+cd ~/Definicion-Senecabot && source .venv/bin/activate
+python -c "import jax; print(jax.devices())"        # [CudaDevice(id=0)]
+python -c "import mujoco; print(mujoco.__version__)" # 3.8.0
+```
+
+Si JAX muestra `CpuDevice`, la GPU no está disponible dentro de WSL (revisa el paso 2).
+
+**6. Abrir el proyecto en VS Code (modo WSL):**
+
+1. Instala VS Code **en Windows** y, dentro de él, la extensión **WSL** (`ms-vscode-remote.remote-wsl`).
+2. Desde Ubuntu:
+   ```bash
+   cd ~/Definicion-Senecabot
+   code .
+   ```
+3. Abajo a la izquierda debe aparecer **`WSL: Ubuntu-24.04`**. Si en cambio aparece el aviso *"The host
+   'wsl.localhost' was not found in the list of allowed hosts"*, VS Code está abriendo la carpeta como Windows
+   (sin la extensión WSL): cancela, instala la extensión y repite `code .`.
+4. Instala la extensión **Python** (VS Code la ofrece "en WSL") y elige el intérprete:
+   `Ctrl+Shift+P` → *Python: Select Interpreter* → `./.venv/bin/python`.
+
+Así la terminal integrada, los notebooks y el debugger usan Ubuntu y el `.venv` con GPU.
+
+**Opcional — Claude Code dentro de Ubuntu** (el de Windows no es visible desde WSL):
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+source ~/.bashrc
+cd ~/Definicion-Senecabot && claude
+```
+
+**GPU con poca VRAM (p. ej. 8 GB).** `conf.yaml` usa 2048 entornos en paralelo; si el entrenamiento falla con
+`RESOURCE_EXHAUSTED` / `out of memory`, reduce los entornos desde la línea de comandos (sin editar archivos):
+
+```bash
+python seneca_loco/simulation/training/train.py experiment.num_envs=1024 experiment.env_params.nconmax=13000
+```
+
+Para una prueba rápida sin cuenta de wandb:
+
+```bash
+WANDB_MODE=disabled python seneca_loco/simulation/training/train.py \
+  experiment.total_timesteps=4e6 experiment.num_envs=1024 \
+  experiment.env_params.nconmax=13000 experiment.validation.num=2
+```
+
+(`validation.num` debe ser ≤ número de actualizaciones = `total_timesteps / num_steps / num_envs`.) Entrena
+con el portátil conectado a la corriente. Para usar wandb: crea una cuenta en wandb.ai y ejecuta `wandb login`
+una vez.
+
 ## Uso
 
 ```bash
