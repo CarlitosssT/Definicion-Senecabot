@@ -132,13 +132,6 @@ Si JAX muestra `CpuDevice`, la GPU no está disponible dentro de WSL (revisa el 
 
 Así la terminal integrada, los notebooks y el debugger usan Ubuntu y el `.venv` con GPU.
 
-**Opcional — Claude Code dentro de Ubuntu** (el de Windows no es visible desde WSL):
-
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-source ~/.bashrc
-cd ~/Definicion-Senecabot && claude
-```
 
 **GPU con poca VRAM (p. ej. 8 GB).** `conf.yaml` usa 2048 entornos en paralelo; si el entrenamiento falla con
 `RESOURCE_EXHAUSTED` / `out of memory`, reduce los entornos desde la línea de comandos (sin editar archivos):
