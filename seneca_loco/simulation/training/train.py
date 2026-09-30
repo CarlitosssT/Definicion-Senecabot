@@ -13,6 +13,7 @@ from loco_mujoco.trajectory.dataclasses import Trajectory
 from loco_mujoco.task_factories.dataset_confs import CustomDatasetConf
 
 from simulation.config import paths
+from simulation.training import finetune
 
 import hydra
 from hydra.core.hydra_config import HydraConfig
@@ -24,7 +25,13 @@ def experiment(config: DictConfig):
     try:
         # Accessing the current sweep number
         result_dir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
-        
+
+        # Fine-tune (a `finetune` block, e.g. conf_finetune_slope.yaml): start from a trained agent. The
+        # experiment config becomes that agent's saved one merged with finetune.experiment (finetune.py).
+        is_finetune = config.get("finetune") is not None
+        if is_finetune:
+            config = finetune.resolve_config(config)
+
         # Setup wandb
         wandb.login()
         config_dict = OmegaConf.to_container(config, resolve=True, throw_on_missing=True)
@@ -44,7 +51,7 @@ def experiment(config: DictConfig):
         factory = TaskFactory.get_factory_cls(config.experiment.task_factory.name)
 
         # load trajectory
-        traj = Trajectory.load(paths.TRAJ_ADAPTED)
+        traj = Trajectory.load(finetune.reference_path(config) if is_finetune else paths.TRAJ_ADAPTED)
         custom_conf = CustomDatasetConf(traj=traj)
 
         # create env
@@ -56,11 +63,17 @@ def experiment(config: DictConfig):
         # setup metric handler (optional)
         mh = MetricsHandler(config, env) if config.experiment.validation.active else None
 
-        # build training function
-        train_fn = PPOJax.build_train_fn(env, agent_conf, mh=mh)
+        if is_finetune:
+            # start from the init agent's weights (fresh optimizer); single seed only
+            init_state = finetune.init_agent_state(config, env, agent_conf)
+            resume_fn = jax.jit(PPOJax.build_resume_train_fn(env, agent_conf, mh=mh))
+            train_fn = lambda rng_key: resume_fn(rng_key, init_state)
+        else:
+            # build training function
+            train_fn = PPOJax.build_train_fn(env, agent_conf, mh=mh)
 
-        # jit and vmap training function
-        train_fn = jax.jit(jax.vmap(train_fn)) if config.experiment.n_seeds > 1 else jax.jit(train_fn)
+            # jit and vmap training function
+            train_fn = jax.jit(jax.vmap(train_fn)) if config.experiment.n_seeds > 1 else jax.jit(train_fn)
 
         # get rng keys and run training
         rngs = [jax.random.PRNGKey(i) for i in range(config.experiment.n_seeds+1)]  # create rngs from seed

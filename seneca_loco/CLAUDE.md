@@ -206,6 +206,47 @@ Key milestones, newest first. Full diagnostic detail is in this file's git histo
 > Condensed on finalization (2026-06-12). The full 2026-06-05 → 2026-06-12 development log is
 > preserved in this file's git history. New post-finalization changes go below, newest first.
 
+### 2026-09-29 (later) — slope fine-tune with a task reward (`conf_finetune_slope_task.yaml`)
+
+- **Why:** the imitation fine-tune (`conf_finetune_slope.yaml`, below) keeps rewarding the flat-ground
+  reference relative to the slope surface (posture, joint angles, 1.40 m/s) and ends the episode when the
+  trunk stops being parallel to the slope. Goats change gait and posture on steep ground.
+- **What:** `train.py --config-name conf_finetune_slope_task` starts from v140 with `SlopeLocomotionReward`
+  (progress along the fall line, alive bonus, stability, energy, foot slip, air time, and MimicReward's
+  smoothness terms; no imitation term), `UprightTerminalStateHandler` (fall = trunk >50° from gravity-up or
+  root <0.15 m) and `critic_warmup_updates: 10`. The same `SlopeRandomizer` ±30° and `gravity_obs` are
+  used. v140's reference goal stays in the observation, because the network depends on it as a
+  rhythm/phase input, and the reference still gives the initial states; nothing rewards following it.
+  `finetune.resolve_config` now drops the init agent's `<kind>_params` when the fine-tune changes
+  `<kind>_type` (reward, terminal state, ...), instead of merging MimicReward keys into the new reward.
+- **Result:** run `artifacts/trained_agents/2026-09-29/18-49-47` (W&B `hvruinbk`), 100M steps in ~35 min.
+  Reward per step rose from 0.69 to 1.55. Final checkpoint, same fall criterion as v140 (trunk >50° from
+  vertical): no falls from −35° to +30°, 22% at +35°, where v140 falls from +25° and at −35°. Speed stays
+  at 1.33–1.46 m/s on every slope, where v140 goes from 2.15 downhill to 0.56 m/s uphill. Uphill cost of
+  transport at 20° is 1.6 against v140's 4.2. The cycle period is unchanged (0.63 s, the reference clock).
+  Analysis and figures are in the repo-level `pruebas_pendiente/` (`visualize_slopes.ipynb`).
+- **Caveat, checkpoint selection:** `PPOJax_saved.pkl` (best validation return) is effectively random here.
+  Validation episodes last 100 steps (1 s), so its return only counts episodes that fell within that
+  second (0.0 in 9 of 24 evaluations). Use `PPOJax_final.pkl` or the slope tests to choose.
+- `simulation/analysis/debug_agent.py::rollout` skips the MimicReward term breakdown (`c_*` keys) when the
+  env's reward is not MimicReward. It used to crash on agents trained with another reward.
+
+### 2026-09-29 — slope fine-tune of v140 (`conf_finetune_slope.yaml`, `finetune.py`)
+
+- **Why:** slope tests (repo-level `pruebas_pendiente/`) showed v140 is blind to the slope and falls
+  beyond ~20–25° uphill (grip, then the gait stalls) and ~25–30° downhill (pitches nose-down); the
+  actuators never saturate.
+- **What:** `python simulation/training/train.py --config-name conf_finetune_slope` fine-tunes from a
+  saved agent. `finetune.py` takes the experiment config saved inside the agent's .pkl (not conf.yaml)
+  merged with `finetune.experiment`; maps the weights onto the new observation layout by observation
+  name, with zero input weights for the added entries, so the start policy and value are exactly v140's
+  (asserted); measures the normalization of the added entries with the v140 policy; fresh optimizer.
+  The config adds `gravity_obs` (trunk-frame gravity, 3 obs → 361) and `SlopeRandomizer` (±30°, uniform
+  per episode; the curriculum is available but off), lr 5e-5, 100M steps, and trains explicitly on the
+  1.40 m/s reference (`trajectory_adapted.preRootSpeed.bak.npz`) whatever the active
+  `trajectory_adapted.npz` is. New fork pieces in `loco-mujoco-seneca/SENECA_LOCAL_CHANGES.md`.
+- `train.py` without a `finetune` block is unchanged.
+
 ### 2026-09-27 — active reference switched back to 1.40 m/s (A/B run)
 
 - `data/processed_data/trajectory_adapted.npz` is again the **1.40 m/s** (mocap-speed) reference, for a

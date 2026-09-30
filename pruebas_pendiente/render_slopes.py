@@ -1,12 +1,12 @@
 """
-Videos de las pruebas de pendiente del agente v140 (un robot, arranque en la fase 0 de la referencia).
+Videos de las pruebas de pendiente (un robot, arranque en la fase 0 de la referencia).
 
 La simulacion corre en el marco de la pendiente (gravedad inclinada, ver slope_test.py); para el
 video se gira todo el mundo (robot + suelo) alrededor del origen para que la gravedad quede vertical,
 asi el suelo se ve inclinado. El video se corta 0.5 s despues de la primera caida.
 
-    MUJOCO_GL=egl python pruebas_pendiente/render_slopes.py [--cases up:5 up:10 ... down:20]
-Salida: pruebas_pendiente/videos/<up|down>_<grados>.mp4
+    MUJOCO_GL=egl python pruebas_pendiente/render_slopes.py [--agent v140|<ruta .pkl>] [--cases up:5 ... down:20]
+Salida: pruebas_pendiente/videos/<up|down>_<grados>.mp4 (v140) o videos/<etiqueta>/<up|down>_<grados>.mp4
 """
 import argparse
 import os
@@ -21,7 +21,7 @@ import mujoco
 import numpy as np
 
 from geometry_opt import config as C
-from slope_test import tilted_spec
+from slope_test import load_agent, make_env
 
 mediapy.set_ffmpeg(imageio_ffmpeg.get_ffmpeg_exe())      # no hace falta ffmpeg en el sistema
 ROOT = Path(__file__).resolve().parent
@@ -68,27 +68,26 @@ def render(qpos, angle, mode, fps, out):
         renderer.update_scene(data, camera=cam)
         frames.append(renderer.render())
     renderer.close()
-    OUT.mkdir(exist_ok=True)
+    out.parent.mkdir(parents=True, exist_ok=True)
     mediapy.write_video(out, frames, fps=fps)
 
 
 def main():
     p = argparse.ArgumentParser()
+    p.add_argument("--agent", default="v140", help="v140, v0218 o ruta a un PPOJax_saved.pkl")
     p.add_argument("--cases", nargs="+",
                    default=[f"{m}:{a}" for m in ("up", "down") for a in (5, 10, 15, 20)] + ["up:25", "down:30"])
     p.add_argument("--seconds", type=float, default=8.0)
     p.add_argument("--fps", type=int, default=50)
     a = p.parse_args()
 
-    from geometry_opt.simulation import _make_env
-    from loco_mujoco.algorithms import PPOJax
     from simulation.analysis.debug_agent import rollout
-    spec = C.MODELS["v140"]
-    agent_conf, agent_state = PPOJax.load_agent(str(spec["agent"]))
+    agent_conf, agent_state, label, reference = load_agent(a.agent)
+    out_dir = OUT if label == "v140" else OUT / label
     for case in a.cases:
         mode, ang = case.split(":")
         ang = float(ang)
-        env = _make_env(agent_conf, spec["reference"], spec=tilted_spec(ang, mode))
+        env = make_env(agent_conf, reference, ang, mode)
         env.th.random_start = False
         hz = 1.0 / float(env.dt)
         n = int(a.seconds * hz)
@@ -97,7 +96,7 @@ def main():
         end = int(fell.argmax()) + int(0.5 * hz) if fell.any() else n
         end = min(end, n)
         step = max(int(round(hz / a.fps)), 1)
-        out = OUT / f"{mode}_{int(ang)}.mp4"
+        out = out_dir / f"{mode}_{int(ang)}.mp4"
         render(d["qpos"][:end:step, 0, :], ang, mode, a.fps, out)
         print(f"{out.name}: {'cae en %.2f s' % (fell.argmax() / hz) if fell.any() else 'no cae'}", flush=True)
 

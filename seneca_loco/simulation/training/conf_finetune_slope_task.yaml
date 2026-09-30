@@ -1,0 +1,61 @@
+# Fine-tune of v140 (2026-09-27/18-22-14) to walk on slopes with a TASK reward: no imitation term, so the
+# policy may change posture, gait and speed with the slope (goats walk differently on flat and steep ground).
+#
+#   python seneca_loco/simulation/training/train.py --config-name conf_finetune_slope_task
+#
+# Starts from v140's weights. Its reference-trajectory goal stays in the observation (the network depends on
+# it as a rhythm/phase input) and the reference still gives the initial states, but nothing rewards following
+# it. The experiment config is v140's own (read from the .pkl) merged with finetune.experiment below; the
+# reward and terminal-state types change, so v140's MimicReward / reference-based fall parameters are dropped
+# (finetune.py). Paths are relative to seneca_loco/ unless absolute.
+defaults:
+  - override hydra/job_logging: default
+  - override hydra/launcher: basic
+
+hydra:
+  run:
+    dir: ${oc.env:SENECA_HOME,/home/ndam/Desktop/workspace/seneca_loco}/artifacts/trained_agents/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+wandb:
+  project: "deepmimic_senecabot"
+
+finetune:
+  init_agent: artifacts/trained_agents/2026-09-27/18-22-14/PPOJax_saved.pkl
+  reference: data/processed_data/trajectory_adapted.preRootSpeed.bak.npz   # goal observation + initial states only
+  curriculum_frac: null     # see conf_finetune_slope.yaml
+  init_std: null            # null keeps v140's learned policy std (~0.07)
+
+  experiment:               # merged over the init agent's saved experiment config
+    total_timesteps: 100e6
+    lr: 5e-5
+    learnable_std: true
+    critic_warmup_updates: 10   # first 10 updates (~4M steps) train only the critic on the new reward
+    env_params:
+      gravity_obs: true
+      domain_randomization_type: SlopeRandomizer
+      domain_randomization_params:
+        slope_range_deg: [-30.0, 30.0]   # + uphill, - downhill; uniform, resampled every episode
+        curriculum_start_deg: 20.0       # only used when curriculum_frac is set
+      terminal_state_type: UprightTerminalStateHandler   # fall = trunk tilted from GRAVITY or collapsed
+      terminal_state_params:
+        max_tilt_deg: 50.0     # trunk up axis vs gravity-up (trunk parallel to a 30 deg slope = 30 deg)
+        min_height: 0.15       # root height above the ground [m] (v140 walks at 0.31-0.40)
+      reward_type: SlopeLocomotionReward
+      reward_params:           # see SlopeLocomotionReward; defaults calibrated on v140's flat gait (~1.6/step)
+        target_speed: 1.4      # [m/s] along the fall line; v140's flat speed
+        vel_sigma: 1.0         # [m/s] width of the speed kernel (wide: still a gradient when steep slopes slow it)
+        vel_w: 1.5
+        alive_w: 0.5
+        yaw_rate_w: 0.5
+        vz_w: 0.5              # bouncing: v140 has v_z rms 0.58 m/s -> -0.17/step
+        ang_vel_w: 0.05
+        roll_w: 5.0            # lateral tilt w.r.t. gravity; trunk pitch is free
+        power_w: 5.0e-4        # v140: 189 W -> -0.09/step
+        torque_w: 1.0e-4       # v140: sum tau^2 = 353 -> -0.04/step
+        action_rate_w: 0.5     # kept from MimicReward
+        action_jerk_w: 0.5     # kept from MimicReward
+        slip_w: 0.2            # v140: 0.59 (m/s)^2 of slip per step -> -0.12/step
+        air_time_w: 3.0
+        air_time_min: 0.2      # [s] swings shorter than this are penalized (v140: median 0.35 s, 34% < 0.1 s)
+        contact_height: 0.027  # foot touching = site below sphere radius + 2 mm
+        release_height: 0.037  # ... and in contact until it rises above this (air-time hysteresis)

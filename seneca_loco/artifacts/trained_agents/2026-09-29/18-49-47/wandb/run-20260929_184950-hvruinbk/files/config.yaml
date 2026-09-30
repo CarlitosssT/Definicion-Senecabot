@@ -1,0 +1,210 @@
+_wandb:
+    value:
+        cli_version: 0.30.0
+        e:
+            azlhpjcu6gtfbuq8b7goxxwyth6e6y2a:
+                args:
+                    - --config-name
+                    - conf_finetune_slope_task
+                codePath: seneca_loco/simulation/training/train.py
+                codePathLocal: simulation/training/train.py
+                cpu_count: 10
+                cpu_count_logical: 20
+                cudaVersion: "13.1"
+                disk:
+                    /:
+                        total: "1081101176832"
+                        used: "16407805952"
+                email: ca.tovar2@uniandes.edu.co
+                executable: /home/andre/Definicion-Senecabot/.venv/bin/python
+                git:
+                    commit: 875162338bfab1f50319b2afd0ac25e046a24add
+                    remote: https://github.com/CarlitosssT/Definicion-Senecabot.git
+                gpu: NVIDIA GeForce RTX 4070 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      memoryTotal: "8585740288"
+                      name: NVIDIA GeForce RTX 4070 Laptop GPU
+                      uuid: GPU-8f4e76fa-0c2b-5e16-cd1d-5e709d3e11c7
+                host: LAPTOP-HCLBEAUL
+                memory:
+                    total: "8133984256"
+                os: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39
+                program: /home/andre/Definicion-Senecabot/seneca_loco/simulation/training/train.py
+                python: CPython 3.12.3
+                root: /home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents/2026-09-29/18-49-47
+                startedAt: "2026-09-29T23:49:50.109169Z"
+                writerId: azlhpjcu6gtfbuq8b7goxxwyth6e6y2a
+        m: []
+        python_version: 3.12.3
+        t:
+            "1":
+                - 12
+                - 45
+                - 49
+                - 50
+            "2":
+                - 12
+                - 45
+                - 49
+                - 50
+            "3":
+                - 2
+                - 16
+                - 61
+                - 62
+            "4": 3.12.3
+            "5": 0.30.0
+            "12": 0.30.0
+            "13": linux-x86_64
+agent_save_path:
+    value: /home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents/2026-09-29/18-49-47/PPOJax_saved.pkl
+experiment:
+    value:
+        activation: tanh
+        anneal_lr: true
+        clip_eps: 0.2
+        critic_warmup_updates: 10
+        debug: false
+        ent_coef: 0.01
+        env_params:
+            control_params: null
+            control_type: DefaultControl
+            domain_randomization_params:
+                curriculum_start_deg: 20
+                slope_range_deg:
+                    - -30
+                    - 30
+            domain_randomization_type: SlopeRandomizer
+            env_name: SenecaBot
+            goal_params:
+                visualize_goal: true
+            goal_type: GoalTrajMimic
+            gravity_obs: true
+            headless: true
+            horizon: 1000
+            nconmax: 26000
+            njmax: 150
+            record_camera: follow
+            reward_params:
+                action_jerk_w: 0.5
+                action_rate_w: 0.5
+                air_time_min: 0.2
+                air_time_w: 3
+                alive_w: 0.5
+                ang_vel_w: 0.05
+                contact_height: 0.027
+                power_w: 0.0005
+                release_height: 0.037
+                roll_w: 5
+                slip_w: 0.2
+                target_speed: 1.4
+                torque_w: 0.0001
+                vel_sigma: 1
+                vel_w: 1.5
+                vz_w: 0.5
+                yaw_rate_w: 0.5
+            reward_type: SlopeLocomotionReward
+            terminal_state_params:
+                max_tilt_deg: 50
+                min_height: 0.15
+            terminal_state_type: UprightTerminalStateHandler
+            use_mjwarp: true
+        gae_lambda: 0.95
+        gamma: 0.995
+        hidden_layers:
+            - 512
+            - 256
+        init_std: 0.3
+        learnable_std: true
+        lr: 5e-05
+        max_grad_norm: 0.5
+        n_seeds: 1
+        normalize_env: true
+        num_envs: 2048
+        num_minibatches: 32
+        num_steps: 200
+        proportion_env_reward: 0
+        task_factory:
+            name: ImitationFactory
+        total_timesteps: 1e+08
+        update_epochs: 4
+        validation:
+            active: true
+            joints_to_ignore: []
+            measures:
+                - EuclideanDistance
+                - DynamicTimeWarping
+                - DiscreteFrechetDistance
+            num: 24
+            num_envs: 100
+            num_steps: 100
+            quantities:
+                - JointPosition
+                - JointVelocity
+                - RelSitePosition
+                - RelSiteOrientation
+                - RelSiteVelocity
+            rel_site_names:
+                - fr_foot_mimic
+                - fl_foot_mimic
+                - br_foot_mimic
+                - bl_foot_mimic
+                - base_mimic
+                - fr_shank_mimic
+                - fl_shank_mimic
+                - br_shank_mimic
+                - bl_shank_mimic
+                - fl_thigh_mimic
+                - fr_thigh_mimic
+                - bl_thigh_mimic
+                - br_thigh_mimic
+        vf_coef: 0.5
+        vmap_across_seeds: true
+        weight_decay: 0
+finetune:
+    value:
+        curriculum_frac: null
+        experiment:
+            critic_warmup_updates: 10
+            env_params:
+                domain_randomization_params:
+                    curriculum_start_deg: 20
+                    slope_range_deg:
+                        - -30
+                        - 30
+                domain_randomization_type: SlopeRandomizer
+                gravity_obs: true
+                reward_params:
+                    action_jerk_w: 0.5
+                    action_rate_w: 0.5
+                    air_time_min: 0.2
+                    air_time_w: 3
+                    alive_w: 0.5
+                    ang_vel_w: 0.05
+                    contact_height: 0.027
+                    power_w: 0.0005
+                    release_height: 0.037
+                    roll_w: 5
+                    slip_w: 0.2
+                    target_speed: 1.4
+                    torque_w: 0.0001
+                    vel_sigma: 1
+                    vel_w: 1.5
+                    vz_w: 0.5
+                    yaw_rate_w: 0.5
+                reward_type: SlopeLocomotionReward
+                terminal_state_params:
+                    max_tilt_deg: 50
+                    min_height: 0.15
+                terminal_state_type: UprightTerminalStateHandler
+            learnable_std: true
+            lr: 5e-05
+            total_timesteps: 1e+08
+        init_agent: artifacts/trained_agents/2026-09-27/18-22-14/PPOJax_saved.pkl
+        init_std: null
+        reference: data/processed_data/trajectory_adapted.preRootSpeed.bak.npz
+wandb:
+    value:
+        project: deepmimic_senecabot

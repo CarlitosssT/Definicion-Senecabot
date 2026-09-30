@@ -7,6 +7,108 @@ a `[SENECA LOCAL CHANGE]` comment. Newest first.
 
 ---
 
+## 2026-09-29 (later) — Task reward for slopes, gravity-relative falls, PPO critic warm-up
+
+**Files:** `loco_mujoco/core/reward/slope_locomotion.py` (new) and `reward/__init__.py` (registration);
+`loco_mujoco/core/terminal_state_handler/upright.py` (new) and its `__init__.py`;
+`loco_mujoco/algorithms/ppo_jax.py` (`_train_fn` / `_loss_fn`).
+
+**Why.** Fine-tuning v140 for slopes with its DeepMimic reward keeps it replicating the flat-ground
+reference relative to the slope surface: trunk parallel to the ground, the reference joint angles and
+1.40 m/s, with a fall defined as the trunk leaving the reference orientation by 30°. Goats walk differently
+on steep ground, so the slope fine-tune (seneca_loco `conf_finetune_slope_task.yaml`) replaces the reward
+with a task reward and the fall criterion with one that does not use the reference.
+
+**What changed.**
+- `SlopeLocomotionReward`: no imitation term. Progress along the fall line
+  `exp(-((v_x - target_speed)^2 + v_y^2) / vel_sigma^2)`, an alive bonus, and penalties for yaw rate,
+  slope-normal bouncing, trunk roll/pitch rates, lateral tilt w.r.t. gravity (the trunk pitch is free),
+  mechanical power, torque², action rate/jerk (as in `MimicReward`) and foot slip while touching the
+  ground, plus an air-time term at each touchdown (short swings, i.e. micro-hops, are penalized). Foot
+  velocities come from `cvel`/`subtree_com` (stateless, exact); contact uses a height threshold with
+  hysteresis for the air time. The total is clipped at 0. Its constructor has no `**kwargs`, so a
+  misspelled weight raises. Default weights were calibrated on v140's recorded flat gait: ~1.6 per step,
+  of which ~20% are penalties.
+- `UprightTerminalStateHandler`: terminal when the trunk's up axis is more than `max_tilt_deg` (50) from
+  gravity-up (the episode's gravity, from `SlopeRandomizer`) or the root is below `min_height` (0.15 m).
+- PPO `critic_warmup_updates` (experiment config, default 0 = unchanged): during the first N updates the
+  actor loss and the entropy bonus are multiplied by 0, so only the critic learns. This lets the loaded
+  critic fit a new reward before its advantages move the policy.
+- XLA workaround: `SlopeRandomizerState.gravity_dir` stores the unit gravity (`(-sin s, 0, -cos s)`),
+  and the observation, the reward and the fall criterion read it through
+  `utils/math.gravity_direction()` instead of computing `g / norm(g)`. In jax 0.7.1 XLA compiled that
+  3-vector normalization into a Triton block-level fusion. Its deduplicated copy was launched with the
+  launch dimensions of a plain loop kernel (48×128 threads for a kernel compiled for 1 warp), so the
+  first execution of the 2048-env task fine-tune failed with `CUDA_ERROR_INVALID_VALUE` ("Failed to add
+  kernel node to a CUDA graph", or "Failed to launch CUDA kernel: fusion_NNNN" with command buffers
+  off). This happened on three launches and was located by dumping the optimized HLO. The 64-env smoke
+  tests and the imitation fine-tune did not hit it: fusion decisions depend on the whole graph.
+
+**Verified.** With the v140 policy on 64 MJWarp envs with random slopes, the reward is finite, ~1.5 per
+step on flat ground and lower on steeper slopes in both directions (0.74 at 20–30° uphill, 0.67 at
+20–30° downhill). Critic warm-up: see the seneca_loco change log.
+
+**Note.** v140 falls within ~0.7 s under CPU MuJoCo even with its own config (it walks under MJWarp), so
+the CPU path (`eval.py --use_mujoco`) cannot evaluate these agents. This is not caused by the changes above.
+
+---
+
+## 2026-09-29 — Restore the `loco_mujoco/datasets` subpackage (was dropped by `.gitignore`)
+
+**Files:** `.gitignore` (removed the `loco_mujoco/datasets/` line); `loco_mujoco/datasets/` (5 `.py`
+files, 112 KB, no data).
+
+**Why.** The `.gitignore` inherited from upstream ignores `loco_mujoco/datasets/`. Upstream still tracks
+those files because they were committed before the rule, but when this package was copied without its
+git history into the Definicion-Senecabot repository the rule dropped them. `ImitationFactory` imports
+`loco_mujoco.datasets.humanoids.LAFAN1` at load time, so no environment could be built from a fresh
+clone (`ModuleNotFoundError: loco_mujoco.datasets`).
+
+**What changed.** Copied `loco_mujoco/datasets/` from upstream robfiras/loco-mujoco at commit
+`3921fedb` (2026-03-10, latest at the time; the exact commit this fork started from is unknown) and
+removed the ignore rule so git tracks it. Every `loco_mujoco.datasets` symbol the package imports
+(`imitation_factory.py`, `smpl/retargeting.py`) resolves. Downloaded datasets never go here (they go to
+the paths set in `LOCOMUJOCO_VARIABLES.yaml` or to the Hugging Face cache), so un-ignoring it does not
+track data.
+
+---
+
+## 2026-09-29 — Slope walking: `SlopeRandomizer`, `SlopeProjectedGravity`, SenecaBot `gravity_obs`
+
+**Files:** `loco_mujoco/core/domain_randomizer/slope.py` (new) and `__init__.py` (registration);
+`loco_mujoco/core/observations/base.py` (`SlopeProjectedGravity` + its `ObservationType` entry);
+`loco_mujoco/environments/quadrupeds/senecabot.py` (`gravity_obs` kwarg);
+`loco_mujoco/core/visuals/video_recorder.py` (ffmpeg fallback).
+
+**Why.** Fine-tune the v140 agent to walk up and down slopes, with the policy perceiving the slope
+(seneca_loco `conf_finetune_slope.yaml`). Slope tests showed v140 is blind to the slope and falls beyond
+~20–25° uphill and ~25–30° downhill.
+
+**What changed.**
+- `SlopeRandomizer` (domain randomizer): samples one slope per episode, uniform in `slope_range_deg`
+  (+ uphill: the robot walks toward +x), and applies it in `update()` as the tilted gravity
+  `|g|·(-sin s, 0, -cos s)` over the flat floor. Per-env `opt.gravity` works under MJWarp (a batched
+  model field). The world frame is the slope frame, so observations, reward and terminal handler stay
+  ground-relative and the flat reference remains valid. Optional linear curriculum on the max |slope|
+  (`curriculum_start_deg`, `curriculum_steps` in steps per env; the per-env counter lives in the state
+  and is not reset between episodes, so freshly reset envs such as PPO validation sample the start range).
+- `SlopeProjectedGravity` (stateful observation): unit gravity in the trunk frame (IMU-like), taken from
+  the `SlopeRandomizer` state (falls back to `model.opt.gravity`). The existing `ProjectedGravityVector`
+  hard-codes world gravity = -z and cannot see a tilted gravity.
+- `SenecaBot(gravity_obs=False)`: when True, appends `SlopeProjectedGravity("proj_gravity", "root")`
+  after the default observations (before the goal). Default False: agents trained without it keep their
+  358-dim layout and load unchanged.
+- `VideoRecorder.stop()`: uses the ffmpeg binary of `imageio-ffmpeg` when there is no system ffmpeg
+  (the bare `"ffmpeg"` raised `FileNotFoundError`, which lost the end-of-training W&B video).
+
+**Verified.** 64 MJWarp envs with random slopes: the observation equals the expected value at reset
+(error 6e-8) and each env's physics follows its own slope (correlation slope vs forward speed −0.98 with
+the v140 policy; speeds match the fixed-slope tests).
+
+**Caller-side.** seneca_loco `simulation/training/finetune.py`, `conf_finetune_slope.yaml`, `train.py`.
+
+---
+
 ## 2026-06-10 — Guard episode-mean metrics against 0/0 → NaN (wandb gaps)
 
 **Files:** `loco_mujoco/algorithms/ppo_jax.py` (`_update_step`, the `metric = SummaryMetrics(...)`

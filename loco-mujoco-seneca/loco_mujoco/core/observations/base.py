@@ -14,7 +14,8 @@ from jax.scipy.spatial.transform import Rotation as jnp_R
 from loco_mujoco.core.stateful_object import StatefulObject
 from loco_mujoco.core.utils.mujoco import (mj_jnt_name2id, mj_jntname2qposid, mj_jntname2qvelid,
                                            mj_jntid2qposid, mj_jntid2qvelid)
-from loco_mujoco.core.utils.math import quat_scalarfirst2scalarlast, calculate_relative_site_quatities
+from loco_mujoco.core.utils.math import (quat_scalarfirst2scalarlast, calculate_relative_site_quatities,
+                                        gravity_direction)
 
 
 class ObservationIndexContainer:
@@ -1016,6 +1017,57 @@ class HeightMatrix(StatefulObservation):
         return backend.ravel(matrix), carry
 
 
+class SlopeProjectedGravity(StatefulObservation):
+    """
+    [SENECA LOCAL CHANGE] Unit gravity vector expressed in the frame of a free joint's body (the trunk):
+    what a (low-pass filtered) IMU accelerometer reads, up to sign.
+
+    Unlike :class:`ProjectedGravityVector`, which assumes that world gravity is -z, the gravity direction
+    is the one of the current episode, taken from the ``SlopeRandomizer`` state (the tilted gravity that
+    simulates a slope; falls back to ``model.opt.gravity`` with any other domain randomizer). This is how
+    a policy perceives the slope. On flat ground with a level trunk it reads (0, 0, -1); on a slope s
+    (+ uphill) with the trunk parallel to the ground, (-sin s, 0, -cos s).
+
+    Args:
+        obs_name: The name of the observation.
+        xml_name: The name of the free joint in the Mujoco XML whose body frame is used.
+
+    """
+
+    dim = 3
+
+    def __init__(self, obs_name: str, xml_name: str, **kwargs):
+        self.xml_name = xml_name
+        super().__init__(obs_name, **kwargs)
+
+    def _init_from_mj(self, env, model, data, current_obs_size):
+        self.min, self.max = [-np.inf] * self.dim, [np.inf] * self.dim
+        self._quat_ind = np.array(mj_jntname2qposid(self.xml_name, model))[3:7]
+        self.obs_ind = np.array([j for j in range(current_obs_size, current_obs_size + self.dim)])
+        self._initialized_from_mj = True
+
+    def get_obs_and_update_state(self, env, model, data, carry, backend):
+        """
+        Get the observation and update the state.
+
+        Args:
+            env: The environment.
+            model: The Mujoco model.
+            data: The Mujoco data structure.
+            carry: The state carry.
+            backend: The backend to use, either np or jnp.
+
+        Returns:
+            The observation and the updated state.
+
+        """
+        R = np_R if backend == np else jnp_R
+        gravity = gravity_direction(carry, model, backend)
+        quat = data.qpos[self._quat_ind].reshape(-1, 4)
+        rot = R.from_quat(quat_scalarfirst2scalarlast(quat))
+        return backend.ravel(rot.inv().apply(gravity)), carry
+
+
 class RelativeSiteQuantaties(StatefulObservation):
     """
     Observation Type holding the position, rotation and velocity of all sites for mimic relatively to the main site.
@@ -1106,6 +1158,7 @@ class ObservationType:
     LastAction = LastAction
     ModelInfo = ModelInfo
     RelativeSiteQuantaties = RelativeSiteQuantaties
+    SlopeProjectedGravity = SlopeProjectedGravity    # [SENECA LOCAL CHANGE]
 
     @classmethod
     def get(cls, obs_name):

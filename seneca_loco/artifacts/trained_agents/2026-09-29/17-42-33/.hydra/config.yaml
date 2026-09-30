@@ -1,0 +1,19 @@
+wandb:
+  project: deepmimic_senecabot
+finetune:
+  init_agent: artifacts/trained_agents/2026-09-27/18-22-14/PPOJax_saved.pkl
+  reference: data/processed_data/trajectory_adapted.preRootSpeed.bak.npz
+  curriculum_frac: null
+  init_std: null
+  experiment:
+    total_timesteps: 100000000.0
+    lr: 5.0e-05
+    learnable_std: true
+    env_params:
+      gravity_obs: true
+      domain_randomization_type: SlopeRandomizer
+      domain_randomization_params:
+        slope_range_deg:
+        - -30.0
+        - 30.0
+        curriculum_start_deg: 20.0

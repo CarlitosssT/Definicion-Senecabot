@@ -1,0 +1,38 @@
+# Fine-tune of v140 (2026-09-27/18-22-14, 100M @ 1.40 m/s) to walk on slopes, perceiving the slope.
+#
+#   python seneca_loco/simulation/training/train.py --config-name conf_finetune_slope
+#
+# The experiment config is NOT conf.yaml's: it is the one saved inside the init agent's .pkl (same
+# reward, network and PPO settings v140 was trained with) merged with finetune.experiment below.
+# See finetune.py. Paths are relative to seneca_loco/ unless absolute.
+defaults:
+  - override hydra/job_logging: default
+  - override hydra/launcher: basic
+
+hydra:
+  run:
+    dir: ${oc.env:SENECA_HOME,/home/ndam/Desktop/workspace/seneca_loco}/artifacts/trained_agents/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+wandb:
+  project: "deepmimic_senecabot"
+
+finetune:
+  init_agent: artifacts/trained_agents/2026-09-27/18-22-14/PPOJax_saved.pkl
+  reference: data/processed_data/trajectory_adapted.preRootSpeed.bak.npz   # the 1.40 m/s reference v140 learned
+  # Slope curriculum: fraction of total_timesteps over which the max |slope| ramps from
+  # curriculum_start_deg to the full range. Off by default: v140 already walks at +-20 deg, so the
+  # uniform range already starts from a solved region, and without it the validation episodes (fresh
+  # envs, which a curriculum keeps at the start range) cover the full range. e.g. 0.4 to enable.
+  curriculum_frac: null
+  init_std: null            # null keeps the init agent's learned policy std (v140: ~0.07); a float resets it
+
+  experiment:               # merged over the init agent's saved experiment config
+    total_timesteps: 100e6
+    lr: 5e-5                # v140: 1e-4 annealed to 0; half of it for a fine-tune (also annealed)
+    learnable_std: true     # v140's saved config predates this key; its network used the default (learnable)
+    env_params:
+      gravity_obs: true     # + gravity direction in the trunk frame (3 obs, IMU-like) -> slope perception
+      domain_randomization_type: SlopeRandomizer
+      domain_randomization_params:
+        slope_range_deg: [-30.0, 30.0]  # + uphill, - downhill; uniform, resampled every episode
+        curriculum_start_deg: 20.0      # only used when curriculum_frac is set

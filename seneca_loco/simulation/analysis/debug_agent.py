@@ -312,7 +312,10 @@ def rollout(env, agent_conf, agent_state, n_envs, n_steps, deterministic, seed,
     act_low = np.asarray(env.info.action_space.low)
     act_high = np.asarray(env.info.action_space.high)
     act_dim = act_low.shape[0]
-    component_fn = make_reward_component_fn(env, act_low, act_high)
+    # the per-term breakdown reproduces MimicReward; agents trained with another reward (e.g. the
+    # SlopeLocomotionReward slope fine-tune) get the rollout without it
+    has_mimic = type(env._reward_function).__name__ == "MimicReward"
+    component_fn = make_reward_component_fn(env, act_low, act_high) if has_mimic else None
 
     def step(carry, _):
         state, rng, last_action, last_last_action = carry
@@ -333,7 +336,7 @@ def rollout(env, agent_conf, agent_state, n_envs, n_steps, deterministic, seed,
         # reward breakdown: last_qvel = qvel before this step (matches MimicReward)
         comps = jax.vmap(component_fn)(new_state.data, ref, action,
                                        state.data.qvel, last_action, last_last_action,
-                                       ts_.traj_no, ts_.subtraj_step_no)
+                                       ts_.traj_no, ts_.subtraj_step_no) if has_mimic else {}
 
         out = dict(
             qpos=new_state.data.qpos,

@@ -148,6 +148,7 @@ class PPOJax(JaxRLAlgorithmBase):
         # extract static agent info
         config, network, tx =\
             (agent_conf.config.experiment, agent_conf.network, agent_conf.tx)
+        critic_warmup = int(config.get("critic_warmup_updates", 0))    # [SENECA LOCAL CHANGE] see _loss_fn
 
         env = cls._wrap_env(env, config)
 
@@ -286,10 +287,20 @@ class PPOJax(JaxRLAlgorithmBase):
                         loss_actor = loss_actor.mean()
                         entropy = pi.entropy().mean()
 
+                        # [SENECA LOCAL CHANGE] critic warm-up: during the first `critic_warmup_updates`
+                        # updates only the critic learns (actor and entropy terms off, so the policy and its
+                        # std stay frozen). For fine-tuning under a new reward, whose values the loaded critic
+                        # does not know yet; 0 (default) = standard PPO.
+                        if critic_warmup > 0:
+                            update_idx = train_state.step // (config.num_minibatches * config.update_epochs)
+                            actor_on = (update_idx >= critic_warmup).astype(jnp.float32)
+                        else:
+                            actor_on = 1.0
+
                         total_loss = (
-                            loss_actor
+                            actor_on * loss_actor
                             + config.vf_coef * value_loss
-                            - config.ent_coef * entropy
+                            - actor_on * config.ent_coef * entropy
                         )
                         return total_loss, (value_loss, loss_actor, entropy)
 

@@ -1,8 +1,19 @@
 import os
+import shutil
 import subprocess
 import cv2
 import datetime
 from pathlib import Path
+
+
+def _ffmpeg_exe():
+    # [SENECA LOCAL CHANGE] fall back to the ffmpeg binary bundled with imageio-ffmpeg (requirements.txt)
+    # when ffmpeg is not installed system-wide; the bare "ffmpeg" raised FileNotFoundError in stop().
+    exe = shutil.which("ffmpeg")
+    if exe is None:
+        import imageio_ffmpeg
+        exe = imageio_ffmpeg.get_ffmpeg_exe()
+    return exe
 
 
 class VideoRecorder(object):
@@ -77,7 +88,7 @@ class VideoRecorder(object):
                 tmp_file = str(self._path / "tmp_") + self._video_name + ".mp4"
                 subprocess.run(
                     [
-                        "ffmpeg",
+                        _ffmpeg_exe(),
                         "-i", self._video_writer_path,  # Input video
                         "-c:v", "libx264",  # H.264 codec
                         "-profile:v", "baseline",  # Set to Baseline profile (can change to main if needed)

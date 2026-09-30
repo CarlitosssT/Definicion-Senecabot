@@ -23,7 +23,7 @@ class SenecaBot(BaseRobotQuadruped):
     )
 
     def __init__(self, spec=None, camera_params=None,
-                 observation_spec=None, actuation_spec=None, **kwargs):
+                 observation_spec=None, actuation_spec=None, gravity_obs=False, **kwargs):
 
         if spec is None:
             spec = self.XML_PATH.resolve()
@@ -34,6 +34,12 @@ class SenecaBot(BaseRobotQuadruped):
             observation_spec = self._get_observation_specification(spec)
         else:
             observation_spec = self.parse_observation_spec(observation_spec)
+
+        # [SENECA LOCAL CHANGE] optional gravity direction in the trunk frame (IMU-like slope perception,
+        # see SlopeProjectedGravity / SlopeRandomizer). Appended after the default entries, so the goal
+        # still comes last and agents trained without it keep their observation layout.
+        if gravity_obs:
+            observation_spec.append(ObservationType.SlopeProjectedGravity("proj_gravity", xml_name="root"))
 
         if actuation_spec is None:
             actuation_spec = self._get_action_specification(spec)

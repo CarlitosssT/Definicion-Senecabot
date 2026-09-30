@@ -1,0 +1,43 @@
+{
+  "os": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "CPython 3.12.3",
+  "startedAt": "2026-09-29T22:42:36.359439Z",
+  "args": [
+    "--config-name",
+    "conf_finetune_slope"
+  ],
+  "program": "/home/andre/Definicion-Senecabot/seneca_loco/simulation/training/train.py",
+  "codePath": "seneca_loco/simulation/training/train.py",
+  "codePathLocal": "simulation/training/train.py",
+  "git": {
+    "remote": "https://github.com/CarlitosssT/Definicion-Senecabot.git",
+    "commit": "875162338bfab1f50319b2afd0ac25e046a24add"
+  },
+  "email": "ca.tovar2@uniandes.edu.co",
+  "root": "/home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents/2026-09-29/17-42-33",
+  "host": "LAPTOP-HCLBEAUL",
+  "executable": "/home/andre/Definicion-Senecabot/.venv/bin/python",
+  "cpu_count": 10,
+  "cpu_count_logical": 20,
+  "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1081101176832",
+      "used": "16221626368"
+    }
+  },
+  "memory": {
+    "total": "8133976064"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+      "memoryTotal": "8585740288",
+      "architecture": "Ada",
+      "uuid": "GPU-8f4e76fa-0c2b-5e16-cd1d-5e709d3e11c7"
+    }
+  ],
+  "cudaVersion": "13.1",
+  "writerId": "ndi1fpvaxmkb6qfz3xk0f7zclabtsw8l"
+}

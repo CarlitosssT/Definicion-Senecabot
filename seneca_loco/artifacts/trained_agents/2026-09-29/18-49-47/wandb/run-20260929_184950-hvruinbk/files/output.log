@@ -1,0 +1,42 @@
+/home/andre/Definicion-Senecabot/loco-mujoco-seneca/loco_mujoco/core/mujoco_mjx.py:94: UserWarning: mjwarp is experimental and may not work with all environments. Resetting is error prone. Training might work, but will not be optimal.
+  warnings.warn(
+Warp 1.12.1 initialized:
+   CUDA Toolkit 12.9, Driver 13.1
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 4070 Laptop GPU" (8 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/andre/.cache/warp/1.12.1
+Warp DeprecationWarning: The symbol `warp.types.warp_type_to_np_dtype` will soon be removed from the public API. It can still be accessed from `warp._src.types.warp_type_to_np_dtype` but might be changed or removed without notice.
+/home/andre/Definicion-Senecabot/loco-mujoco-seneca/loco_mujoco/core/mujoco_mjx.py:94: UserWarning: mjwarp is experimental and may not work with all environments. Resetting is error prone. Training might work, but will not be optimal.
+  warnings.warn(
+[finetune] obs 358 -> 361; new entries ['proj_gravity'] at [35, 36, 37]
+Module mujoco.mjx.warp.ffi 98d2031 load on device 'cuda:0' took 2.07 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.smooth 26bbc02 load on device 'cuda:0' took 21.73 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.collision_driver 88f7770 load on device 'cuda:0' took 1.44 ms  (cached)
+Module _nxn_broadphase__locals__kernel_c763f4cb c763f4c load on device 'cuda:0' took 1.26 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d126b47c d126b47 load on device 'cuda:0' took 2.07 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.constraint c567367 load on device 'cuda:0' took 3.64 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.forward 16fbac8 load on device 'cuda:0' took 1.65 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.passive 8bfe11c load on device 'cuda:0' took 2.15 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.forward 8f5355c load on device 'cuda:0' took 4.65 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.support dd3f924 load on device 'cuda:0' took 1.25 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_314754c8 72c8212 load on device 'cuda:0' took 51.21 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.solver b116efb load on device 'cuda:0' took 2.48 ms  (cached)
+Module solve_init_jaref__locals__kernel_9d78657e 9d78657 load on device 'cuda:0' took 1.14 ms  (cached)
+Module mul_m_dense__locals___mul_m_dense_ea441704 ea44170 load on device 'cuda:0' took 1.66 ms  (cached)
+Module update_constraint_efc__locals__kernel_81015163 8101516 load on device 'cuda:0' took 2.90 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_6569dae6 6569dae load on device 'cuda:0' took 1.37 ms  (cached)
+Module update_gradient_JTDAJ_dense_tiled__locals__kernel_0b1959fb d0fda0e load on device 'cuda:0' took 2.07 ms  (cached)
+Module update_gradient_cholesky__locals__kernel_b3ff7b12 38ea10d load on device 'cuda:0' took 52.41 ms  (cached)
+Module linesearch_iterative__locals__kernel_f2a333a5 de36de8 load on device 'cuda:0' took 1.82 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.sensor 18a78e5 load on device 'cuda:0' took 3.99 ms  (cached)
+Module _tile_euler_dense__locals__euler_dense_d65f5756 29c8649 load on device 'cuda:0' took 55.17 ms  (cached)
+[finetune] new entries normalization: mean [0.020999999716877937, 0.0020000000949949026, -0.9549999833106995], std [0.2930000126361847, 0.024000000208616257, 0.04100000113248825]
+[finetune] start policy/value == init agent's (max |diff| 4.1e-05)
+[checkpoint] best val-return 132.01 @ step 37,273,600 (checkpoint 9/24, 0 NaN evals skipped); final val-return 85.03 @ step 100,352,000
+
+Saved agent to: /home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents/2026-09-29/18-49-47/PPOJax_saved.pkl
+
+Time taken to log metrics: 5.2928924560546875e-05s
+Successfully compressed recorded video and saved at:  LocoMuJoCo_recordings/29-09-2026_19-24-43/recording.mp4

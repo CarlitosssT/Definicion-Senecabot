@@ -460,3 +460,18 @@ def atleast_3d(tensor, backend):
         tensor = backend.expand_dims(tensor, axis=0)
     
     return tensor
+
+def gravity_direction(carry, model, backend):
+    """
+    [SENECA LOCAL CHANGE] Unit gravity vector of the current episode, in the world frame: the
+    ``gravity_dir`` of the SlopeRandomizer state when present, else ``model.opt.gravity`` normalized.
+
+    Written without ``v / norm(v)``: in jax 0.7.1 XLA turns that reduction + broadcast division on a
+    3-vector into a Triton block-level fusion whose deduplicated copy is launched with the wrong block
+    size (CUDA_ERROR_INVALID_VALUE at the first execution of the 2048-env training).
+    """
+    dr_state = carry.domain_randomizer_state
+    if hasattr(dr_state, "gravity_dir"):
+        return dr_state.gravity_dir
+    g = backend.asarray(model.opt.gravity)
+    return g / backend.sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2])
