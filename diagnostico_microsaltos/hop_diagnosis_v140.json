@@ -1,0 +1,199 @@
+{
+ "agent": "v140",
+ "reference": "/home/andre/Definicion-Senecabot/seneca_loco/data/processed_data/trajectory_adapted.preRootSpeed.bak.npz",
+ "short_s": 0.2,
+ "contact_ref_frac": 0.3,
+ "legs": [
+  "fr",
+  "fl",
+  "br",
+  "bl"
+ ],
+ "reference_foot_min_height_cm": {
+  "fr": 5.97611222735448,
+  "fl": 6.19558344361506,
+  "br": 2.045613519708045,
+  "bl": 2.817162502041609
+ },
+ "reference_cycle_s": 0.635,
+ "reference_stats": {
+  "fr": {
+   "n_flights": 94,
+   "flight_median_s": 0.46,
+   "pct_flights_lt_0p1s": 0.0,
+   "pct_flights_lt_short": 0.0,
+   "short_flight_peak_cm": null,
+   "touchdowns_per_cycle": 0.9894736842105263,
+   "touchdown_vz_median_mps": -0.46580253281015715,
+   "stance_frac": 0.2755905511811024,
+   "mimic_label_stance_frac": 0.2755905511811024,
+   "mimic_label_vs_height_agree_pct": 72.44094488188976
+  },
+  "fl": {
+   "n_flights": 94,
+   "flight_median_s": 0.47000000000000003,
+   "pct_flights_lt_0p1s": 0.0,
+   "pct_flights_lt_short": 0.0,
+   "short_flight_peak_cm": null,
+   "touchdowns_per_cycle": 0.9894736842105263,
+   "touchdown_vz_median_mps": -0.5344654304363163,
+   "stance_frac": 0.25984251968503935,
+   "mimic_label_stance_frac": 0.25984251968503935,
+   "mimic_label_vs_height_agree_pct": 74.01574803149606
+  },
+  "br": {
+   "n_flights": 189,
+   "flight_median_s": 0.04,
+   "pct_flights_lt_0p1s": 50.264550264550266,
+   "pct_flights_lt_short": 50.264550264550266,
+   "short_flight_peak_cm": 5.58125685428898,
+   "touchdowns_per_cycle": 1.9894736842105263,
+   "touchdown_vz_median_mps": -0.30554585548646046,
+   "stance_frac": 0.4094488188976378,
+   "mimic_label_stance_frac": 0.4094488188976378,
+   "mimic_label_vs_height_agree_pct": 69.29133858267717
+  },
+  "bl": {
+   "n_flights": 190,
+   "flight_median_s": 0.1675,
+   "pct_flights_lt_0p1s": 50.0,
+   "pct_flights_lt_short": 50.0,
+   "short_flight_peak_cm": 5.9696999974637786,
+   "touchdowns_per_cycle": 2.0,
+   "touchdown_vz_median_mps": -0.345763593359084,
+   "stance_frac": 0.47244094488188976,
+   "mimic_label_stance_frac": 0.47244094488188976,
+   "mimic_label_vs_height_agree_pct": 52.75590551181102
+  }
+ },
+ "deterministic": {
+  "n_envs_used": 32,
+  "fall_frac": 0.0,
+  "trunk_vz_rms_mps": 0.5826314091682434,
+  "action_saturation_pct": {
+   "fr_hip": 0.0,
+   "fr_knee": 0.0,
+   "fr_ankle": 0.0,
+   "fl_hip": 0.0,
+   "fl_knee": 0.0,
+   "fl_ankle": 0.0,
+   "br_hip": 0.0,
+   "br_knee": 0.0,
+   "br_ankle": 0.0,
+   "bl_hip": 0.0,
+   "bl_knee": 0.0,
+   "bl_ankle": 0.0
+  },
+  "legs": {
+   "fr": {
+    "n_flights": 385,
+    "flight_median_s": 0.52,
+    "pct_flights_lt_0p1s": 0.0,
+    "pct_flights_lt_short": 0.0,
+    "short_flight_peak_cm": null,
+    "touchdowns_per_cycle": 0.9267086160494294,
+    "touchdown_vz_median_mps": -1.5620301619338117,
+    "stance_frac": 0.17975057806754863,
+    "agree_with_mimic_label_pct": 90.18990940449567
+   },
+   "fl": {
+    "n_flights": 394,
+    "flight_median_s": 0.51,
+    "pct_flights_lt_0p1s": 0.0,
+    "pct_flights_lt_short": 0.0,
+    "short_flight_peak_cm": null,
+    "touchdowns_per_cycle": 0.9483719343466889,
+    "touchdown_vz_median_mps": -1.3816174715210061,
+    "stance_frac": 0.19521625412228497,
+    "agree_with_mimic_label_pct": 93.33990371858535
+   },
+   "br": {
+    "n_flights": 809,
+    "flight_median_s": 0.07,
+    "pct_flights_lt_0p1s": 50.803461063040785,
+    "pct_flights_lt_short": 50.803461063040785,
+    "short_flight_peak_cm": 5.7575650818635085,
+    "touchdowns_per_cycle": 1.947291611386983,
+    "touchdown_vz_median_mps": -1.3001286453662515,
+    "stance_frac": 0.36310223266745006,
+    "agree_with_mimic_label_pct": 90.87600924908078
+   },
+   "bl": {
+    "n_flights": 397,
+    "flight_median_s": 0.34,
+    "pct_flights_lt_0p1s": 0.0,
+    "pct_flights_lt_short": 0.0,
+    "short_flight_peak_cm": null,
+    "touchdowns_per_cycle": 0.9555930404457753,
+    "touchdown_vz_median_mps": -0.873209975665227,
+    "stance_frac": 0.4704901254690876,
+    "agree_with_mimic_label_pct": 90.5538076646071
+   }
+  }
+ },
+ "stochastic": {
+  "n_envs_used": 32,
+  "fall_frac": 0.0,
+  "trunk_vz_rms_mps": 0.5988228917121887,
+  "action_saturation_pct": {
+   "fr_hip": 0.0,
+   "fr_knee": 0.0,
+   "fr_ankle": 0.0,
+   "fl_hip": 0.0,
+   "fl_knee": 0.0,
+   "fl_ankle": 0.0,
+   "br_hip": 0.0,
+   "br_knee": 0.0,
+   "br_ankle": 0.0,
+   "bl_hip": 0.0,
+   "bl_knee": 0.0,
+   "bl_ankle": 0.0
+  },
+  "legs": {
+   "fr": {
+    "n_flights": 388,
+    "flight_median_s": 0.52,
+    "pct_flights_lt_0p1s": 0.0,
+    "pct_flights_lt_short": 0.5154639175257731,
+    "short_flight_peak_cm": 17.438231542421768,
+    "touchdowns_per_cycle": 0.933929722148516,
+    "touchdown_vz_median_mps": -1.4116596333455442,
+    "stance_frac": 0.17694552897918958,
+    "agree_with_mimic_label_pct": 89.82601114438422
+   },
+   "fl": {
+    "n_flights": 401,
+    "flight_median_s": 0.51,
+    "pct_flights_lt_0p1s": 0.0,
+    "pct_flights_lt_short": 1.2468827930174564,
+    "short_flight_peak_cm": 15.845174535987994,
+    "touchdowns_per_cycle": 0.965221181911224,
+    "touchdown_vz_median_mps": -1.3005947490634573,
+    "stance_frac": 0.1930556082028733,
+    "agree_with_mimic_label_pct": 92.83575300405596
+   },
+   "br": {
+    "n_flights": 816,
+    "flight_median_s": 0.1,
+    "pct_flights_lt_0p1s": 48.89705882352941,
+    "pct_flights_lt_short": 51.225490196078425,
+    "short_flight_peak_cm": 5.692024070515962,
+    "touchdowns_per_cycle": 1.9641408589515181,
+    "touchdown_vz_median_mps": -1.1983662571725455,
+    "stance_frac": 0.3544975550585649,
+    "agree_with_mimic_label_pct": 90.22781547325727
+   },
+   "bl": {
+    "n_flights": 651,
+    "flight_median_s": 0.31,
+    "pct_flights_lt_0p1s": 38.863287250384026,
+    "pct_flights_lt_short": 38.863287250384026,
+    "short_flight_peak_cm": 4.097711849879953,
+    "touchdowns_per_cycle": 1.5669800235017626,
+    "touchdown_vz_median_mps": -0.9539835199331475,
+    "stance_frac": 0.4391797126719988,
+    "agree_with_mimic_label_pct": 90.49315795458853
+   }
+  }
+ }
+}
