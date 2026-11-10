@@ -247,7 +247,9 @@ class MimicReward(TrajectoryBasedReward):
         # kinematic and its feet don't all reach the floor). Built in init_from_traj.
         self._contact_w_sum = kwargs.get("contact_w_sum", 0.0)
         self._contact_height = kwargs.get("contact_height", 0.037)
-        self._contact_ref_frac = kwargs.get("contact_ref_frac", 0.3)
+        # a float, or one value per contact site (e.g. hind feet 0.5 to merge a double-dip stance into one)
+        frac = kwargs.get("contact_ref_frac", 0.3)
+        self._contact_ref_frac = float(frac) if np.isscalar(frac) else np.array([float(f) for f in frac])
         contact_sites = kwargs.get("contact_sites", None)
         if self._contact_w_sum > 0.0:
             assert contact_sites, "contact_w_sum > 0 requires contact_sites (the foot site names)."
@@ -261,6 +263,24 @@ class MimicReward(TrajectoryBasedReward):
         # action_rate_w: w * sum((a_t - a_{t-1})^2); action_jerk_w: w * sum((a_t - 2a_{t-1} + a_{t-2})^2).
         self._action_rate_w = kwargs.get("action_rate_w", 0.0)
         self._action_jerk_w = kwargs.get("action_jerk_w", 0.0)
+
+        # [SENECA LOCAL CHANGE] joint acceleration penalty applied once, on the mimicked hinge joints only:
+        # qacc_w * mean(((qvel_t - qvel_{t-1}) / dt / 100)^2). The legacy joint_acc_coeff is squared and sums over
+        # every dof (incl. the light bar joints of the RR model), so it is ~0 or dominated by the bars.
+        self._qacc_w = kwargs.get("qacc_w", 0.0)
+        self._qacc_dof = self._qvel_ind[~self._free_joint_qvel_mask[self._qvel_ind]]
+
+        # [SENECA LOCAL CHANGE] soft joint-limit penalty on the mimicked limited hinges: for each joint closer than
+        # joint_limit_margin_deg to a limit, joint_limit_w * ((margin - distance) / margin)^2, summed over joints.
+        self._joint_limit_w = kwargs.get("joint_limit_w", 0.0)
+        margin = np.radians(kwargs.get("joint_limit_margin_deg", 5.0))
+        lim = [(mj_jntid2qposid(i, model)[0], *model.jnt_range[i]) for i in range(model.njnt)
+               if model.jnt_type[i] == mujoco.mjtJoint.mjJNT_HINGE and model.jnt_limited[i]
+               and (joints_for_mimic is None or mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, i) in joints_for_mimic)]
+        self._limit_qpos = np.array([l[0] for l in lim], dtype=int)
+        self._limit_lo = np.array([l[1] for l in lim])
+        self._limit_hi = np.array([l[2] for l in lim])
+        self._limit_margin = float(margin)
 
     def init_from_traj(self, traj_handler: Any = None) -> None:
         """
@@ -472,6 +492,16 @@ class MimicReward(TrajectoryBasedReward):
         if self._action_jerk_w > 0.0:
             total_reward = total_reward - self._action_jerk_w * backend.sum(
                 backend.square(action - 2.0 * reward_state.last_action + reward_state.last_last_action))
+
+        if self._joint_limit_w > 0.0 and len(self._limit_qpos):
+            q_lim = data.qpos[self._limit_qpos]
+            dist = backend.minimum(q_lim - self._limit_lo, self._limit_hi - q_lim)
+            inside = backend.maximum(self._limit_margin - dist, 0.0) / self._limit_margin
+            total_reward = total_reward - self._joint_limit_w * backend.sum(backend.square(inside))
+
+        if self._qacc_w > 0.0:
+            qacc = (data.qvel[self._qacc_dof] - reward_state.last_qvel[self._qacc_dof]) / env.dt
+            total_reward = total_reward - self._qacc_w * backend.mean(backend.square(qacc / 100.0))
 
         total_reward = total_reward + total_penalities
 

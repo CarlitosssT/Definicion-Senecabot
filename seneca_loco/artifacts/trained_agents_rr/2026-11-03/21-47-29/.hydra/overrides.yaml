@@ -1,0 +1,3 @@
+- experiment.num_envs=1024
+- experiment.env_params.nconmax=13000
+- experiment.total_timesteps=300e6

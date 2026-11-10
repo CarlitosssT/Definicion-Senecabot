@@ -51,7 +51,13 @@ def experiment(config: DictConfig):
         factory = TaskFactory.get_factory_cls(config.experiment.task_factory.name)
 
         # load trajectory
-        traj = Trajectory.load(finetune.reference_path(config) if is_finetune else paths.TRAJ_ADAPTED)
+        if is_finetune:
+            ref_path = finetune.reference_path(config)
+        elif config.get("reference") is not None:        # e.g. conf_rr.yaml: gait adapted to the RR model
+            ref_path = paths.PROJECT_ROOT / str(config.reference)
+        else:
+            ref_path = paths.TRAJ_ADAPTED
+        traj = Trajectory.load(ref_path)
         custom_conf = CustomDatasetConf(traj=traj)
 
         # create env

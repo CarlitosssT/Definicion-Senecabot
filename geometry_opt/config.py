@@ -14,6 +14,9 @@ ROOT = Path(__file__).resolve().parent                      # .../Optimizacion G
 WORKSPACE = ROOT.parent                                     # .../Optimizacion Geometria
 SENECA = WORKSPACE / "seneca_loco"
 XML_PATH = SENECA / "simulation" / "assets" / "xml" / "senecabot_loco.xml"
+# RR variant of the model: thigh (first link) removed, tibia and metatarsus unchanged. The recorded gaits and the
+# trained policies are for XML_PATH (RRR); a gait recorded on the RR model needs a policy retrained on this XML.
+XML_RR_PATH = SENECA / "simulation" / "assets" / "xml" / "senecabot_loco_rr.xml"
 CATALOG_CSV = WORKSPACE / "my actuator" / "motors_MyActuator_Series_L_H_X.csv"
 RESULTS_DIR = ROOT / "results"                              # cached gaits (+ outputs of the default mode)
 SUMMARY_MD = ROOT / "results_summary.md"
@@ -110,6 +113,45 @@ CONTACT_REG_LAMBDA = 1.0
 # The trained gait leans on the joint-limit stops (hind ankles up to ~24 N·m, hind hips ~9 N·m).
 # True: the mechanical stops carry that load (as in the simulation). False: the motor must supply it.
 LIMITS_CARRY_LOAD = True
+
+# ------------------------------------------------------------------------------------------------
+# Transmission linkage (two RR bar mechanisms that drive the 2R leg: tibia + metatarsus)
+# ------------------------------------------------------------------------------------------------
+# linkage.py sizes, per leg, the bars l1..l4 and the attachment fractions f1, f2 of the two RR
+# mechanisms that move the tibia (r1) and the metatarsus (r2) from the torso, plus the offsets (dx, dy)
+# between the two fixed points. It only needs the two last links of the leg, so it works the same on
+# the RRR model (thigh present) and on the RR model (thigh removed, tibia and metatarsus unchanged).
+# The gait of each policy gives the range of motion of the two links; the stage is off by default
+# because the mechanism does not enter the dynamics loop (run_pipeline --linkage, or set True here).
+LINKAGE_ENABLED = False
+LINKAGE_XML = XML_PATH                  # model the recorded gait belongs to (XML_RR_PATH once a gait exists for it)
+LINKAGE_LEGS = ("fr", "br")             # legs to design; FL / BL are the mirror images of FR / BR
+LINKAGE_X_FORWARD = True                # the mechanism's +x (towards the actuators A2, A3) points forward
+LINKAGE_DX_MIN_M = LINKAGE_DY_MIN_M = 0.048 * 0.7071067811865476   # minimum dx, dy (48 mm at 45 deg); O = (dx, -dy)
+LINKAGE_D_EXTRA_M = 0.05                # how far dx, dy may grow above their minimum
+LINKAGE_L3_ANGLE_RAD = None             # absolute angle of l3 in the reference pose; None = optimized
+LINKAGE_F_VALUES = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5)   # sweep of f1 and f2 (0.05 steps: ~4x slower)
+LINKAGE_F_MIN = 0.2                     # smallest f considered for the chosen design (lever arm)
+LINKAGE_RANGE_MARGIN_DEG = 20.0         # extension of the range of motion used to measure the range of P
+LINKAGE_REACH_MARGIN = 0.05             # slack with respect to the fully stretched RR
+LINKAGE_CLEARANCE_M = 0.005             # minimum distance between links that do not share a joint
+LINKAGE_L_MAX_M = {"front": 0.30, "back": 0.40}      # upper bound of l1, l2, l3
+LINKAGE_WEIGHTS = dict(l4=3.0, length=1.0, range=2.0, offset=1.0, torque=1.0)   # l4 / 0.1 m, (l1+l2+l3) / 0.3 m, ...,
+#                                         torque = actuator / joint peak torque through the linkage (1 = direct drive)
+LINKAGE_TORQUE_SAMPLES = 300            # gait poses used for the torque term of the cost
+LINKAGE_GRID = (9, 13)                  # poses per axis: nominal range, extended range
+LINKAGE_DE = dict(maxiter=50, popsize=8, tol=1e-8, seed=1)   # scipy differential_evolution
+LINKAGE_WORKERS = None                  # processes for the (f1, f2) sweep; None = all cores, 1 = serial
+
+
+def linkage_params():
+    """Snapshot of the linkage settings (plain dict, picklable for the worker processes)."""
+    return dict(
+        x_forward=LINKAGE_X_FORWARD, dx_min=LINKAGE_DX_MIN_M, dy_min=LINKAGE_DY_MIN_M, d_extra=LINKAGE_D_EXTRA_M,
+        l3_angle=LINKAGE_L3_ANGLE_RAD, f_values=tuple(LINKAGE_F_VALUES), f_min=LINKAGE_F_MIN,
+        range_margin_deg=LINKAGE_RANGE_MARGIN_DEG, reach_margin=LINKAGE_REACH_MARGIN,
+        clearance=LINKAGE_CLEARANCE_M, l_max=dict(LINKAGE_L_MAX_M), weights=dict(LINKAGE_WEIGHTS),
+        grid=tuple(LINKAGE_GRID), de=dict(LINKAGE_DE), torque_samples=LINKAGE_TORQUE_SAMPLES)
 
 
 def output_dir():

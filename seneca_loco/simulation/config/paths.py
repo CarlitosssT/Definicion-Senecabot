@@ -35,3 +35,7 @@ AGENT_DEBUG    = FIGURES / "agent_debug"
 
 for _d in (ARTIFACTS, TRAINED_AGENTS, OPTUNA_DIR, WANDB_DIR, RECORDINGS, FIGURES, AGENT_DEBUG):
     _d.mkdir(parents=True, exist_ok=True)
+
+# RR model (knee + ankle driven through the two RR bar mechanisms, see geometry_opt/make_rr_xml.py)
+XML_PATH_RR      = XML_DIR / "senecabot_loco_rr.xml"
+TRAJ_ADAPTED_RR  = PROC_DIR / "trajectory_adapted_rr.npz"

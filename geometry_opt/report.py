@@ -186,6 +186,61 @@ def comparison(all_results):
                               "Structure [kg]", "Motor models used"], rows), ""])
 
 
+def linkage_section(key, rows):
+    """RR transmission linkage designed from the gait of one policy (linkage.py)."""
+    mm = lambda v: _f(v * 1000, 1)
+    lines = [
+        f"## RR transmission linkage — {C.MODELS[key]['label']}",
+        "Two RR bar mechanisms drive the 2R leg (tibia r1 + metatarsus r2) from the torso: RR 1 (l1, l2) moves the tibia "
+        "from the actuator at B, RR 2 (l3, l4) moves the metatarsus from the tibia pivot O = (dx, -dy). f1, f2 are the "
+        "attachment fractions along r1, r2. The range of motion is the one the recorded gait uses; the design covers it "
+        "completely with no overlapping bars; the bars are as short as possible (l4 first) while keeping the torque "
+        "amplification of the linkage low (weight `torque` in `LINKAGE_WEIGHTS`). "
+        "Not part of the dynamics loop: the motor torques and masses above do not include the linkage.",
+        "",
+        _table(["Leg", "r1 [mm]", "r2 [mm]", "f1", "f2", "l1 [mm]", "l2 [mm]", "l3 [mm]", "l4 [mm]", "dx [mm]", "dy [mm]",
+                "a3 [deg]", "Extended range [%]", "Gait reached [%]", "Gait no overlap [%]"],
+               [[r["leg"], mm(r["r1"]), mm(r["r2"]), f"{r['f1']:.2f}", f"{r['f2']:.2f}", mm(r["l1"]), mm(r["l2"]),
+                 mm(r["l3"]), mm(r["l4"]), mm(r["dx"]), mm(r["dy"]), _f(r["a3_deg"], 0), _f(r["extended_range_pct"], 0),
+                 _f(r["gait_reached_pct"], 1), _f(r["gait_no_overlap_pct"], 1)] for r in rows]),
+        "",
+        "Range of motion used (absolute plane angles, deg): "
+        + "; ".join(f"{r['leg']}: theta1 {r['theta1_min_deg']:.0f}..{r['theta1_max_deg']:.0f}, "
+                    f"theta2 {r['theta2_min_deg']:.0f}..{r['theta2_max_deg']:.0f}" for r in rows),
+        f"Settings: f swept over {list(C.LINKAGE_F_VALUES)} (design chosen with f >= {C.LINKAGE_F_MIN}), clearance "
+        f"{C.LINKAGE_CLEARANCE_M*1000:.0f} mm, dx and dy >= {C.LINKAGE_DX_MIN_M*1000:.1f} mm. "
+        "Maps, design plots and animations: results/linkage_<policy>_<leg>_*.png / .gif.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def linkage_actuator_section(key, material, rows):
+    """Actuators of the RR linkage: requirement through the mechanism vs the knee/ankle joint they replace."""
+    lines = [
+        f"### Actuators through the linkage — {C.MODELS[key]['label']}, {material}",
+        "The two actuators of each leg drive the tibia (RR 1, replaces the knee motor) and the metatarsus (RR 2, replaces the "
+        "ankle motor) through the bars. Requirement of each actuator = joint torque/speed of the gait (design of the "
+        f"{material} iteration) taken through the Jacobian of the linkage (virtual work: tau_act = G^-T A^-T tau_joint, "
+        "omega_act = G A omega_joint). The hip is removed in the RR model. The gait is the RRR one (hip moving), so this is "
+        "an estimate until a gait is recorded on the RR model.",
+        "",
+        _table(["Actuator", "Torque max [N·m]", "Torque RMS [N·m]", "ω max [rpm]", "Joint it replaces", "Joint torque max [N·m]",
+                "Joint torque RMS [N·m]", "Joint ω max [rpm]", "Selected motor", "Motor mass [kg]", "Binding",
+                "Motor with direct drive", "Direct mass [kg]", "min |det G|"],
+               [[r["actuator"], _f(r["tau_max"], 2), _f(r["tau_rms"], 2), _f(r["omega_max_rpm"], 0), r["joint"],
+                 _f(r["joint_tau_max"], 2), _f(r["joint_tau_rms"], 2), _f(r["joint_omega_max_rpm"], 0),
+                 r["model"] + ("" if r["feasible"] else " ⚠ infeasible"), _f(r["motor_mass"], 3), r["binding"],
+                 r["direct_model"], _f(r["direct_mass"], 3), f"{r['min_abs_det_G']:.2f}"] for r in rows]),
+        "",
+        f"Motor mass of the linkage actuators: {sum(r['motor_mass'] for r in rows):.2f} kg vs "
+        f"{sum(r['direct_mass'] for r in rows):.2f} kg for the knee/ankle motors of the same legs (direct drive). "
+        f"Largest power-conservation error of the mapping: {max(r['power_error'] for r in rows):.1e} W.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def notes():
     return "\n".join([
         "## Method and limitations",
@@ -205,6 +260,10 @@ def notes():
         "- Motors are point masses at the joints (the catalog has no dimensions); rotor inertia/gear "
         "reflected inertia is the model's armature (0.01 kg·m²), not motor-specific.",
         "- Torque–speed coupling is not checked beyond peak torque and rated speed separately.",
+        "- The RR transmission linkage (--linkage) is sized only from the range of motion of the recorded gait: the "
+        "bars are zero-width segments (no collision with the torso or fixed joints), and neither their mass nor the "
+        "transmission ratios enter the dynamics loop. The gait is that of the RRR model (thigh present); the RR "
+        "model (senecabot_loco_rr.xml) needs a policy retrained on it.",
         "- FDM strength: horizontal-print TDS values; parts loaded across layers can retain only ~50–70% "
         "(`ANISOTROPY_FACTOR`). Stiffness, buckling, fatigue and joint/connection design are not covered.",
         "",

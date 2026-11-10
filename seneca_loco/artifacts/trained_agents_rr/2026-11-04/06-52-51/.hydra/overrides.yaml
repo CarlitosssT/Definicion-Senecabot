@@ -1,0 +1,6 @@
+- reference=data/processed_data/trajectory_adapted_rr_1p40.npz
+- experiment.env_params.reward_params.rootvel_w_exp=4.0
+- experiment.num_envs=1024
+- experiment.env_params.nconmax=13000
+- experiment.total_timesteps=30e6
+- experiment.validation.num=3

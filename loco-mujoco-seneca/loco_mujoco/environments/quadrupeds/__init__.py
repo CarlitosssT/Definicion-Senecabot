@@ -8,6 +8,7 @@ from .bd_spot_mjx import MjxBDSpot
 from .anymal_c import AnymalC
 from .anymal_c_mjx import MjxAnymalC
 from .senecabot import SenecaBot
+from .senecabot_rr import SenecaBotRR
 
 
 # register environment
@@ -20,3 +21,4 @@ MjxBDSpot.register()
 AnymalC.register()
 MjxAnymalC.register()
 SenecaBot.register()
+SenecaBotRR.register()

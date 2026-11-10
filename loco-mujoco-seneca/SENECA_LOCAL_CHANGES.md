@@ -7,6 +7,50 @@ a `[SENECA LOCAL CHANGE]` comment. Newest first.
 
 ---
 
+## 2026-11-04 (later 2) — `MimicReward`: soft joint-limit penalty `joint_limit_w`
+
+**Files:** `loco_mujoco/core/reward/trajectory_based.py` (`MimicReward.__init__`, `__call__`).
+
+**Why.** The 1.40 m/s RR agent kept its hind ankles on their -85° stop ~0.15 s per cycle (the reference reaches
+-80°): the stop gives free support, nothing in the reward discourages it.
+
+**What.** `joint_limit_w` (default 0 = unchanged), `joint_limit_margin_deg` (default 5): for every limited hinge in
+`joints_for_mimic` closer than the margin to a limit, `reward -= joint_limit_w * ((margin - distance) / margin)^2`
+(summed over joints), applied before the clip at 0.
+
+---
+
+## 2026-11-04 (later) — `MimicReward`: per-foot `contact_ref_frac`, `qacc_w` joint acceleration penalty
+
+**Files:** `loco_mujoco/core/reward/trajectory_based.py` (`MimicReward.__init__`, `init_from_traj`, `__call__`).
+
+**Why.** The SenecaBot reference's hind feet have a double-dip stance (two height minima ~2 cm apart per cycle), so
+the contact label with `contact_ref_frac: 0.3` marks two stances per cycle and rewards a micro-hop; the front feet
+need 0.3. The hind legs of the RR agents moved jerkily (knee/ankle accelerations 3x the reference's), and the legacy
+`joint_acc_coeff` is squared and sums over every dof, including the light bar joints of the RR model.
+
+**What.** `contact_ref_frac` accepts one value per `contact_sites` entry (a float keeps the old behavior).
+`qacc_w` (default 0 = unchanged): `reward -= qacc_w * mean(((qvel_t - qvel_{t-1}) / dt / 100)^2)` over the
+mimicked hinge dofs (`joints_for_mimic` minus the free root), applied once, before the clip at 0.
+
+---
+
+## 2026-11-04 — `SenecaBotRR` environment (RR legs driven through bar linkages)
+
+**Files:** `loco_mujoco/environments/quadrupeds/senecabot_rr.py` (new), `environments/quadrupeds/__init__.py`
+(import + `register()`).
+
+**Why.** The leg is being redesigned without the hip (RR): tibia and metatarsus are driven from the torso by two RR
+bar mechanisms (geometry_opt/make_rr_xml.py -> seneca_loco `senecabot_loco_rr.xml`). The model has 31 qpos (free
+root + knee + ankle + 4 bar joints per leg) and 8 crank motors, so it needs its own observation / action spec.
+
+**What.** Subclass of `SenecaBot` with the RR XML. Observations: root (`FreeJointPosNoXY`, `FreeJointVel`) + knee
+and ankle position / velocity of every leg (the bar joints follow from them through the closed loops). Actions:
+`<leg>_rr1`, `<leg>_rr2`. `init_qpos` is the XML's closed reference pose (qpos0) at z = 0.38 m. Nothing in
+`SenecaBot` changed.
+
+---
+
 ## 2026-09-29 (later) — Task reward for slopes, gravity-relative falls, PPO critic warm-up
 
 **Files:** `loco_mujoco/core/reward/slope_locomotion.py` (new) and `reward/__init__.py` (registration);

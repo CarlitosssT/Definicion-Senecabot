@@ -1,0 +1,39 @@
+INFO:2026-11-04 06:52:55,021:jax._src.xla_bridge:822: Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+[2026-11-04 06:52:55,021][jax._src.xla_bridge][INFO] - Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+/home/andre/Definicion-Senecabot/loco-mujoco-seneca/loco_mujoco/core/mujoco_mjx.py:94: UserWarning: mjwarp is experimental and may not work with all environments. Resetting is error prone. Training might work, but will not be optimal.
+  warnings.warn(
+Warp 1.12.1 initialized:
+   CUDA Toolkit 12.9, Driver 13.4
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 4070 Laptop GPU" (8 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/andre/.cache/warp/1.12.1
+Warp DeprecationWarning: The symbol `warp.types.warp_type_to_np_dtype` will soon be removed from the public API. It can still be accessed from `warp._src.types.warp_type_to_np_dtype` but might be changed or removed without notice.
+Module mujoco.mjx.warp.ffi 98d2031 load on device 'cuda:0' took 3.79 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.smooth 26bbc02 load on device 'cuda:0' took 30.39 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.collision_driver 88f7770 load on device 'cuda:0' took 3.20 ms  (cached)
+Module _nxn_broadphase__locals__kernel_c763f4cb c763f4c load on device 'cuda:0' took 3.06 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d126b47c d126b47 load on device 'cuda:0' took 3.63 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.constraint c567367 load on device 'cuda:0' took 4.40 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.forward 16fbac8 load on device 'cuda:0' took 4.57 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.passive 8bfe11c load on device 'cuda:0' took 4.10 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.forward 8f5355c load on device 'cuda:0' took 3.98 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.support dd3f924 load on device 'cuda:0' took 3.27 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_192b6b0b e7dff32 load on device 'cuda:0' took 81.31 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.solver b116efb load on device 'cuda:0' took 4.80 ms  (cached)
+Module solve_init_jaref__locals__kernel_0547b166 0547b16 load on device 'cuda:0' took 3.46 ms  (cached)
+Module mul_m_dense__locals___mul_m_dense_7c0d1ff4 7c0d1ff load on device 'cuda:0' took 3.93 ms  (cached)
+Module update_constraint_efc__locals__kernel_81015163 8101516 load on device 'cuda:0' took 2.88 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_2e84c15f 2e84c15 load on device 'cuda:0' took 2.58 ms  (cached)
+Module update_gradient_JTDAJ_dense_tiled__locals__kernel_7dcf39c0 760f74a load on device 'cuda:0' took 4.56 ms  (cached)
+Module update_gradient_cholesky__locals__kernel_72cfdeaf b20c8d1 load on device 'cuda:0' took 80.16 ms  (cached)
+Module linesearch_iterative__locals__kernel_f2a333a5 de36de8 load on device 'cuda:0' took 3.81 ms  (cached)
+Module mujoco.mjx.third_party.mujoco_warp._src.sensor 18a78e5 load on device 'cuda:0' took 12.24 ms  (cached)
+Module _tile_euler_dense__locals__euler_dense_ce39708a 86a85e8 load on device 'cuda:0' took 65.59 ms  (cached)
+[checkpoint] best val-return 21.83 @ step 10,035,200 (checkpoint 1/3, 0 NaN evals skipped); final val-return 0.00 @ step 30,105,600
+
+Saved agent to: /home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents_rr/2026-11-04/06-52-51/PPOJax_saved.pkl
+
+Time taken to log metrics: 5.91278076171875e-05s
+Successfully compressed recorded video and saved at:  LocoMuJoCo_recordings/04-11-2026_07-17-05/recording.mp4

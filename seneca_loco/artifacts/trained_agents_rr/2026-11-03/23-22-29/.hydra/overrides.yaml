@@ -1,0 +1,6 @@
+- experiment.num_envs=1024
+- experiment.env_params.nconmax=13000
+- experiment.total_timesteps=30e6
+- experiment.validation.num=3
+- experiment.learnable_std=false
+- experiment.ent_coef=0.0

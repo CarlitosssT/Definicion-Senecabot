@@ -1,0 +1,23 @@
+wandb:
+  project: deepmimic_senecabot_rr
+finetune:
+  init_agent: artifacts/trained_agents_rr/2026-11-04/08-06-02/PPOJax_final.pkl
+  reference: data/processed_data/trajectory_adapted_rr_1p40.npz
+  curriculum_frac: null
+  init_std: null
+  experiment:
+    total_timesteps: 30000000.0
+    lr: 0.0001
+    num_envs: 1024
+    validation:
+      num: 3
+    env_params:
+      nconmax: 13000
+      reward_params:
+        qpos_w_exp: 5.9682311184743835
+        qacc_w: 0.1
+        contact_ref_frac:
+        - 0.3
+        - 0.3
+        - 0.5
+        - 0.5

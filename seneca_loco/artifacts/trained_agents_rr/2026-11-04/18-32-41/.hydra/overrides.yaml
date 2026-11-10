@@ -1,0 +1,4 @@
+- finetune.init_agent=artifacts/trained_agents_rr/2026-11-04/17-37-28/PPOJax_final.pkl
+- finetune.reference=data/processed_data/trajectory_adapted_rr_1p40.npz
+- finetune.experiment.env_params.reward_params.qpos_w_exp=5.9682311184743835
+- +finetune.experiment.env_params.terminal_state_params.root_height_margin=0.03

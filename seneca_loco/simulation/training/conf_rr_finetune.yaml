@@ -1,0 +1,31 @@
+# Fine-tune of an RR agent (conf_rr.yaml) with a sharper knee / ankle posture term.
+# python simulation/training/train.py --config-name conf_rr_finetune finetune.init_agent=<agent pkl>
+defaults:
+  - override hydra/job_logging: default
+  - override hydra/launcher: basic
+
+hydra:
+  run:
+    dir: ${oc.env:SENECA_HOME,/home/andre/Definicion-Senecabot/seneca_loco}/artifacts/trained_agents_rr/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+wandb:
+  project: "deepmimic_senecabot_rr"
+
+finetune:
+  init_agent: artifacts/trained_agents_rr/2026-11-04/00-12-36/PPOJax_final.pkl   # 30M from scratch, no-slip reference
+  reference: data/processed_data/trajectory_adapted_rr.npz
+  curriculum_frac: null
+  init_std: null            # keep the init agent's learned std
+
+  experiment:               # merged over the init agent's saved experiment config
+    total_timesteps: 30e6
+    lr: 1e-4
+    num_envs: 1024
+    validation:
+      num: 3
+    env_params:
+      nconmax: 13000
+      reward_params:
+        # the agent walked crouched (knees 14-24 deg below the reference, front knees on their joint limit):
+        # at 5.97 that posture cost only ~0.37 of ~2.75 per step
+        qpos_w_exp: 15.0

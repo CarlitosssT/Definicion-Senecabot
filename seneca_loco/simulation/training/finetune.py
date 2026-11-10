@@ -132,13 +132,13 @@ def init_agent_state(config, env, agent_conf, n_envs=256, n_steps=200, seed=0):
 
     state = jax.vmap(env.mjx_reset)(jax.random.split(jax.random.key(seed), n_envs))
     state, obs_seq = jax.jit(lambda s: jax.lax.scan(step, s, None, length=n_steps))(state)
-    obs_added = np.asarray(obs_seq)[..., added].reshape(-1, len(added))
-
     mean = np.zeros(new_dim, dtype=np.float32)
     var = np.ones(new_dim, dtype=np.float32)
     mean[dst], var[dst] = np.asarray(old_rs["mean"])[src], np.asarray(old_rs["var"])[src]
-    mean[added] = obs_added.mean(0)
-    var[added] = np.maximum(obs_added.var(0), 1e-4)
+    if len(added):          # a fine-tune with the same observation layout (e.g. only reward changes) adds none
+        obs_added = np.asarray(obs_seq)[..., added].reshape(-1, len(added))
+        mean[added] = obs_added.mean(0)
+        var[added] = np.maximum(obs_added.var(0), 1e-4)
     run_stats = {"RunningMeanStd_0": {"mean": mean, "var": var,
                                       "count": np.asarray(old_rs["count"], dtype=np.float32)}}
     print(f"[finetune] new entries normalization: mean {np.round(mean[added], 3).tolist()}, "

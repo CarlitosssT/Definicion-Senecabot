@@ -1,0 +1,2 @@
+- finetune.init_agent=artifacts/trained_agents_rr/2026-11-04/02-05-02/PPOJax_final.pkl
+- finetune.experiment.env_params.reward_params.qpos_w_exp=5.9682311184743835

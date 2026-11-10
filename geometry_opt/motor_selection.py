@@ -28,9 +28,15 @@ def _requirements(summary):
 
 
 def select(catalog, summary):
-    out = []
     tau_max, tau_rms, w_max = _requirements(summary)
-    for j, name in enumerate(JOINT_NAMES):
+    return select_requirements(catalog, JOINT_NAMES, tau_max, tau_rms, w_max)
+
+
+def select_requirements(catalog, names, tau_max, tau_rms, w_max):
+    """Lightest motor per entry for the given requirements: |tau|max [N·m], tau_RMS [N·m], |omega|max [rpm].
+    `names` label the entries (joints, or the actuators of a transmission linkage)."""
+    out = []
+    for j, name in enumerate(names):
         req = dict(peak=C.FS_TORQUE * tau_max[j],
                    nominal=C.FS_TORQUE * tau_rms[j] if C.CHECK_RMS_TORQUE else 0.0,
                    speed=C.FS_SPEED * w_max[j] if C.CHECK_SPEED else 0.0)

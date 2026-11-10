@@ -1,0 +1,202 @@
+_wandb:
+    value:
+        cli_version: 0.30.0
+        e:
+            5oqv5w7z0xgw03jnrocapksl2jh3lemw:
+                args:
+                    - --config-name
+                    - conf_rr_finetune
+                codePath: seneca_loco/simulation/training/train.py
+                codePathLocal: simulation/training/train.py
+                cpu_count: 10
+                cpu_count_logical: 20
+                cudaVersion: "13.4"
+                disk:
+                    /:
+                        total: "1081101176832"
+                        used: "16708698112"
+                email: ca.tovar2@uniandes.edu.co
+                executable: /home/andre/Definicion-Senecabot/.venv/bin/python
+                git:
+                    commit: c3010c47559444e525697617783d061bd8f1bc8f
+                    remote: https://github.com/CarlitosssT/Definicion-Senecabot.git
+                gpu: NVIDIA GeForce RTX 4070 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      memoryTotal: "8585740288"
+                      name: NVIDIA GeForce RTX 4070 Laptop GPU
+                      uuid: GPU-8f4e76fa-0c2b-5e16-cd1d-5e709d3e11c7
+                host: LAPTOP-HCLBEAUL
+                memory:
+                    total: "8133984256"
+                os: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39
+                program: /home/andre/Definicion-Senecabot/seneca_loco/simulation/training/train.py
+                python: CPython 3.12.3
+                root: /home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents_rr/2026-11-04/01-00-10
+                startedAt: "2026-11-04T06:00:12.530317Z"
+                writerId: 5oqv5w7z0xgw03jnrocapksl2jh3lemw
+        m: []
+        python_version: 3.12.3
+        t:
+            "1":
+                - 12
+                - 45
+                - 49
+                - 50
+            "2":
+                - 12
+                - 45
+                - 49
+                - 50
+            "3":
+                - 2
+                - 16
+                - 61
+                - 62
+            "4": 3.12.3
+            "5": 0.30.0
+            "12": 0.30.0
+            "13": linux-x86_64
+agent_save_path:
+    value: /home/andre/Definicion-Senecabot/seneca_loco/artifacts/trained_agents_rr/2026-11-04/01-00-10/PPOJax_saved.pkl
+experiment:
+    value:
+        activation: tanh
+        anneal_lr: true
+        clip_eps: 0.2
+        debug: false
+        ent_coef: 0.01
+        env_params:
+            control_params: null
+            control_type: DefaultControl
+            env_name: SenecaBotRR
+            goal_params:
+                visualize_goal: true
+            goal_type: GoalTrajMimic
+            headless: true
+            horizon: 1000
+            nconmax: 13000
+            njmax: 150
+            record_camera: follow
+            reward_params:
+                action_jerk_w: 0.1
+                action_rate_coeff: 0.0025146232695822477
+                action_rate_w: 0.1
+                contact_height: 0.037
+                contact_ref_frac: 0.3
+                contact_sites:
+                    - fr_foot_mimic
+                    - fl_foot_mimic
+                    - br_foot_mimic
+                    - bl_foot_mimic
+                contact_w_sum: 0.5
+                joint_acc_coeff: 0.0005
+                joint_torque_coeff: 0.0033
+                joints_for_mimic:
+                    - root
+                    - fr_knee_joint
+                    - fr_ankle_joint
+                    - fl_knee_joint
+                    - fl_ankle_joint
+                    - br_knee_joint
+                    - br_ankle_joint
+                    - bl_knee_joint
+                    - bl_ankle_joint
+                qpos_w_exp: 15
+                qpos_w_sum: 1.1
+                qvel_w_exp: 1
+                qvel_w_sum: 0.65
+                rootvel_w_exp: 100
+                rootvel_w_sum: 0.5
+                rpos_w_sum: 0
+                rquat_w_sum: 0
+                rvel_w_sum: 0
+                sites_for_mimic:
+                    - fr_foot_mimic
+                    - fl_foot_mimic
+                    - br_foot_mimic
+                    - bl_foot_mimic
+                    - base_mimic
+                    - fr_shank_mimic
+                    - fl_shank_mimic
+                    - br_shank_mimic
+                    - bl_shank_mimic
+                    - fl_thigh_mimic
+                    - fr_thigh_mimic
+                    - bl_thigh_mimic
+                    - br_thigh_mimic
+                track_root_xy: false
+            reward_type: MimicReward
+            use_mjwarp: true
+        gae_lambda: 0.95
+        gamma: 0.995
+        hidden_layers:
+            - 512
+            - 256
+        init_std: 0.3
+        learnable_std: true
+        lr: 0.0001
+        max_grad_norm: 0.5
+        n_seeds: 1
+        normalize_env: true
+        num_envs: 1024
+        num_minibatches: 32
+        num_steps: 200
+        proportion_env_reward: 0
+        task_factory:
+            name: ImitationFactory
+        total_timesteps: 3e+07
+        update_epochs: 4
+        validation:
+            active: true
+            joints_to_ignore: []
+            measures:
+                - EuclideanDistance
+                - DynamicTimeWarping
+                - DiscreteFrechetDistance
+            num: 3
+            num_envs: 100
+            num_steps: 100
+            quantities:
+                - JointPosition
+                - JointVelocity
+                - RelSitePosition
+                - RelSiteOrientation
+                - RelSiteVelocity
+            rel_site_names:
+                - fr_foot_mimic
+                - fl_foot_mimic
+                - br_foot_mimic
+                - bl_foot_mimic
+                - base_mimic
+                - fr_shank_mimic
+                - fl_shank_mimic
+                - br_shank_mimic
+                - bl_shank_mimic
+                - fl_thigh_mimic
+                - fr_thigh_mimic
+                - bl_thigh_mimic
+                - br_thigh_mimic
+        vf_coef: 0.5
+        vmap_across_seeds: true
+        weight_decay: 0
+finetune:
+    value:
+        curriculum_frac: null
+        experiment:
+            env_params:
+                nconmax: 13000
+                reward_params:
+                    qpos_w_exp: 15
+            lr: 0.0001
+            num_envs: 1024
+            total_timesteps: 3e+07
+            validation:
+                num: 3
+        init_agent: artifacts/trained_agents_rr/2026-11-04/00-12-36/PPOJax_final.pkl
+        init_std: null
+        reference: data/processed_data/trajectory_adapted_rr.npz
+wandb:
+    value:
+        project: deepmimic_senecabot_rr
